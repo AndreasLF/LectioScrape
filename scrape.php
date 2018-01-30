@@ -45,6 +45,17 @@ foreach($html->find('.s2skemabrik') as $element){
     print_r($class);
     var_dump($class);
    
+    //Teacher
+    if(preg_match('/Lærer:\s(.*?)\s\((.*?)\)\sLokale/', $data, $teacher)){
+        print_r($teacher);
+        var_dump($teacher);         
+    }else if(preg_match('/Lærere:\s(.*?)\sLokale/', $data, $teacherTemp)){
+        //preg_match('/([^,\s]+)/', $teacherTemp[1], $teacher);
+        $teacher=preg_split("/[,\s]+/",$teacherTemp[1]);
+            
+        print_r($teacher);
+        var_dump($teacher);
+    } 
     
 }
     
