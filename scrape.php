@@ -57,6 +57,25 @@ foreach($html->find('.s2skemabrik') as $element){
         var_dump($teacher);
     } 
     
+    
+    
+    //Room
+    if(preg_match('/Lokale\S+\s(.*)/', $data, $room)){
+        print_r($room);
+        var_dump($room);
+        
+            //Sorts the string if there is a note or homework
+            if(preg_match('/(.*?)\sNote/', $room[1],$roomSorted)){
+                print_r($roomSorted);
+                var_dump($roomSorted);
+            }
+            if(preg_match('/(.*?)\sLektier/', $room[1],$roomSorted)){
+                print_r($roomSorted);
+                var_dump($roomSorted);
+            }
+    }
+     
+    
 }
     
 
