@@ -16,6 +16,7 @@ foreach($html->find('.s2skemabrik') as $element){
              
         //LessonStatus changed
         $lessonStatus = 'Ændret';
+        echo $lessonStaus;
             
     }
     //Checks if the class has been cancelled by performing a regex
@@ -23,7 +24,9 @@ foreach($html->find('.s2skemabrik') as $element){
         
         //LessonStaus is changed
         $lessonStatus = 'Aflyst';
+        echo $lessonStaus;
     }
+    
    
     
 }
