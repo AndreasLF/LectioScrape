@@ -27,6 +27,23 @@ foreach($html->find('.s2skemabrik') as $element){
         echo $lessonStaus;
     }
     
+    
+    //Dato
+    preg_match('/(\d\d|\d)\/(\d\d|\d)-(\d\d\d\d)/', $data, $dato);
+    print_r($dato);
+    var_dump($dato);
+        
+
+    //Tid
+    preg_match('/(\d\d:\d\d)\stil\s(\d\d:\d\d)/', $data, $time);
+    print_r($time);
+    var_dump($time);   
+        
+   
+    //Class
+    preg_match('/Hold:\s(.*?)\sLærer/', $data, $class);
+    print_r($class);
+    var_dump($class);
    
     
 }
