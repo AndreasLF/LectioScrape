@@ -17,8 +17,21 @@ $yyyy = "2018";
     
 $date = $yyyy.$mm.$dd;
 $dateInt = (int)$date ;   
+
+
+$startTimeHours = "14";
+$startTimeMinutes = "30";
+$startTime = $startTimeHours.$startTimeMinutes."00";
+$startTimeInt = (int)$startTime;
+
+$endTimeHours = "15";
+$endTimeMinutes = "30";
+$endTime = $endTimeHours.$endTimeMinutes."00";
+$endTimeInt = (int)$endTime;
+
+
  
-$query = "INSERT INTO `skema`(`ID`, `Week`, `Date`) VALUES (null,'062018',$dateInt)";
+$query = "INSERT INTO `skema`(`ID`, `Week`, `Date`,`StartTime`, `EndTime`) VALUES (null,'062018',$dateInt,$startTimeInt,$endTimeInt)";
 
 $result = mysqli_query($connection, $query); //mysqli performs a query on the database. It returns true, false or an object containing information about the query
 
