@@ -6,6 +6,22 @@ require('simple_html_dom.php');
 include('connection.php');
 
 
+
+/*
+$query = "INSERT INTO `skema`(`ID`, `Week`, `Status`, `Description`, `Date`, `StartTime`, `EndTime`, `Class`, `Teacher`, `Room`, `Homework`, `Note`) VALUES (null,'062018','$lessonStatus','$descriptionString','$dateDay."-".$dateMonth."-".$dateYear','$startTimeString','$startTimeString','$classString','$teacherString','$roomString','$homeworkString','$noteString')";
+*/
+
+$mm = "03";
+$dd = "20";
+$yyyy = "2018";
+    
+$date = $yyyy.$mm.$dd;
+$dateInt = (int)$date ;   
+ 
+$query = "INSERT INTO `skema`(`ID`, `Week`, `Date`) VALUES (null,'062018',$dateInt)";
+
+$result = mysqli_query($connection, $query); //mysqli performs a query on the database. It returns true, false or an object containing information about the query
+
 //creates html-DOM from the URL
 $html = file_get_html('https://www.lectio.dk/lectio/681/SkemaNy.aspx?type=elev&elevid=14742506655');
 
