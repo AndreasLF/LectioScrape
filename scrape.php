@@ -237,6 +237,7 @@ foreach($html->find('.s2skemabrik') as $element){
    
         
         else{ //If $result is false (mysqli_query was unsuccesful)
+            echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
         
     }
 }
