@@ -200,6 +200,7 @@ foreach($html->find('.s2skemabrik') as $element){
         echo "Note: " . $noteString . "<br>";
         echo "=================================================================<br>";
         
+
     }
 }
 
