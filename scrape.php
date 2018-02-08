@@ -6,37 +6,14 @@ require('simple_html_dom.php');
 include('connection.php');
 
 
+$schoolID = "681";
+$studentID = "14742506655";
+$weekNumber = "102018";
+$lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekNumber;
 
-/*
-$query = "INSERT INTO `skema`(`ID`, `Week`, `Status`, `Description`, `Date`, `StartTime`, `EndTime`, `Class`, `Teacher`, `Room`, `Homework`, `Note`) VALUES (null,'062018','$lessonStatus','$descriptionString','$dateDay."-".$dateMonth."-".$dateYear','$startTimeString','$startTimeString','$classString','$teacherString','$roomString','$homeworkString','$noteString')";
-*/
-
-$mm = "03";
-$dd = "20";
-$yyyy = "2018";
-    
-$date = $yyyy.$mm.$dd;
-$dateInt = (int)$date ;   
-
-
-$startTimeHours = "14";
-$startTimeMinutes = "30";
-$startTime = $startTimeHours.$startTimeMinutes."00";
-$startTimeInt = (int)$startTime;
-
-$endTimeHours = "15";
-$endTimeMinutes = "30";
-$endTime = $endTimeHours.$endTimeMinutes."00";
-$endTimeInt = (int)$endTime;
-
-
- 
-$query = "INSERT INTO `skema`(`ID`, `Week`, `Date`,`StartTime`, `EndTime`) VALUES (null,'062018',$dateInt,$startTimeInt,$endTimeInt)";
-
-$result = mysqli_query($connection, $query); //mysqli performs a query on the database. It returns true, false or an object containing information about the query
 
 //creates html-DOM from the URL
-$html = file_get_html('https://www.lectio.dk/lectio/681/SkemaNy.aspx?type=elev&elevid=14742506655');
+$html = file_get_html($lectioURL);
 
 foreach($html->find('.s2skemabrik') as $element){
     $data = $element->getAttribute('data-additionalinfo');
@@ -113,11 +90,21 @@ foreach($html->find('.s2skemabrik') as $element){
         //Time
         if(preg_match('/(\d\d:\d\d)\stil\s(\d\d:\d\d)/', $data, $time)){
             
-            $startTimeString = $time[1];
-            $endTimeString = $time[2];
+            $startTimeArray = preg_split("/[:]+/",$time[1]);
+            $endTimeArray = preg_split("/[:]+/",$time[2]);
+            
+            $startTimeString = $startTimeArray[0].$startTimeArray[1];
+            $endTimeString = $endTimeArray[0].$endTimeArray[1];
             
             print_r($time);
             var_dump($time);
+            
+            var_dump($startTimeString);
+            var_dump($endTimeString);
+        }
+        else{
+            $startTimeString = "0000";
+            $endTimeString = "0000";
         }
    
         //Class
@@ -200,9 +187,14 @@ foreach($html->find('.s2skemabrik') as $element){
         echo "Note: " . $noteString . "<br>";
         echo "=================================================================<br>";
         
+        
+        
+        /*
+        $query = "INSERT INTO `skema`(`ID`, `Week`, `Status`, `Description`, `Date`, `StartTime`, `EndTime`, `Class`, `Teacher`, `Room`, `Homework`, `Note`) VALUES (null,'062018','$lessonStatus','$descriptionString','$dateDay."-".$dateMonth."-".$dateYear','$startTimeString','$startTimeString','$classString','$teacherString','$roomString','$homeworkString','$noteString')";
+        */
 
         
-        $mm = "03";
+       
         
         if(strlen($dateDay)==1){
             $dd = "0".$dateDay;
@@ -217,27 +209,26 @@ foreach($html->find('.s2skemabrik') as $element){
             $mm = $dateMonth;
         }
         
-        $dd = "20";
-        $yyyy = "2018";
+        
+        $yyyy = $dateYear;
 
-        $date = $yyyy.$mm.$dd;
-        $dateInt = (int)$date ;   
+        $date = $yyyy.$mm.$dd;  
 
         
         $startTimeString = $startTimeString . "00";
         $endTimeString = $endTimeString . "00";
 
-        echo $startTimeString;
-        $query = "INSERT INTO `skema`(`ID`, `Week`, `Date`,`StartTime`, `EndTime`) VALUES (null,'062018',$dateInt,$startTimeString,$endTimeString)";
+        $query = "INSERT INTO `skema`(`ID`, `Week`, `Status`, `Description`, `Date`, `StartTime`, `EndTime`, `Class`, `Teacher`, `Room`, `Homework`, `Note`) VALUES (null,$weekNumber,'$lessonStatus','$descriptionString',$date,$startTimeString,$endTimeString,'$classString','$teacherString','$roomString','$homeworkString','$noteString')";
 
         $result = mysqli_query($connection, $query); //mysqli performs a query on the database. It returns true, false or an object containing information about the query
         
-
-            echo mysqli_error($result);
-   
-        
+        if ($result){ //If $result is true (mysqli_query was successful)
+            echo "Data uploaded successfully<br><br>";
+            
+        }
         else{ //If $result is false (mysqli_query was unsuccesful)
             echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
+        }
         
     }
 }
