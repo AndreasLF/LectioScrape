@@ -236,6 +236,7 @@ foreach($html->find('.s2skemabrik') as $element){
             echo mysqli_error($result);
    
         
+        else{ //If $result is false (mysqli_query was unsuccesful)
         
     }
 }
