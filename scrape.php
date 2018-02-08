@@ -201,6 +201,42 @@ foreach($html->find('.s2skemabrik') as $element){
         echo "=================================================================<br>";
         
 
+        
+        $mm = "03";
+        
+        if(strlen($dateDay)==1){
+            $dd = "0".$dateDay;
+        }
+        else{
+            $dd = $dateDay;
+        }
+        if(strlen($dateMonth)==1){
+            $mm = "0".$dateMonth;
+        }
+        else{
+            $mm = $dateMonth;
+        }
+        
+        $dd = "20";
+        $yyyy = "2018";
+
+        $date = $yyyy.$mm.$dd;
+        $dateInt = (int)$date ;   
+
+        
+        $startTimeString = $startTimeString . "00";
+        $endTimeString = $endTimeString . "00";
+
+        echo $startTimeString;
+        $query = "INSERT INTO `skema`(`ID`, `Week`, `Date`,`StartTime`, `EndTime`) VALUES (null,'062018',$dateInt,$startTimeString,$endTimeString)";
+
+        $result = mysqli_query($connection, $query); //mysqli performs a query on the database. It returns true, false or an object containing information about the query
+        
+
+            echo mysqli_error($result);
+   
+        
+        
     }
 }
 
