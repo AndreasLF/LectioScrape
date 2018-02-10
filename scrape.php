@@ -22,6 +22,14 @@ foreach($html->find('.s2skemabrik') as $element){
         
         $lesson = new Lesson($data);
         
+        if(is_null($lesson->homework)){
+            echo "i'm null";
+        }
+        
+        
+        
+        $null = null;
+        
         echo "=================================================================<br>";
         echo $data . "<br>";
         echo "Status: " . $lesson->status . "<br>";
@@ -36,10 +44,14 @@ foreach($html->find('.s2skemabrik') as $element){
         echo "Note: " . $lesson->note . "<br>";
         echo "=================================================================<br>";
         
-
-        $query = "INSERT INTO `skema`(`ID`, `Week`, `Status`, `Description`, `Date`, `StartTime`, `EndTime`, `Class`, `Teacher`, `Room`, `Homework`, `Note`) VALUES (null,$weekNumber,'$lesson->status','$lesson->description','$lesson->date','$lesson->startTime','$lesson->endTime','$lesson->class','$lesson->teacher','$lesson->room','$lesson->homework','$lesson->note')";
-
-        $result = mysqli_query($connection, $query); //mysqli performs a query on the database. It returns true, false or an object containing information about the query
+     
+        
+        $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
+        
+        $stmt->bind_param("sssssssssss",$weekNumber,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); //Binds parameters to the prepared statement. Every parameter is of type String
+        
+        $result = $stmt->execute(); //Executes the prepared statement. Returns a boolean - true on succes and false on failure.
+      
         
         if ($result){ //If $result is true (mysqli_query was successful)
             echo "Data uploaded successfully<br><br>";
@@ -48,6 +60,10 @@ foreach($html->find('.s2skemabrik') as $element){
         else{ //If $result is false (mysqli_query was unsuccesful)
             echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
         }
+        
+        
+        $stmt->close(); //Closes the prepared statement
+        
         
     }
 }
@@ -105,11 +121,11 @@ class Lesson{
         //Else if there is a string before the date. Here the class description will show up if there is any.
         else if(preg_match('/(.*)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
             
-            $this->status = null;
+            $this->status = NULL;
             $this->description = $matches[1];
         }
         else{
-            $this->description = null; 
+            $this->description = NULL; 
         }
     }
     
@@ -137,7 +153,7 @@ class Lesson{
             $this->date = $yyyy.$mm.$dd;  
         }
         else{
-            $this->date = null;
+            $this->date = NULL;
         }
     }
     
@@ -152,8 +168,8 @@ class Lesson{
             $this->endTime= $endTimeArray[0].$endTimeArray[1]."00";
         }
         else{
-            $this->startTime = null;
-            $this->endTime = null;
+            $this->startTime = NULL;
+            $this->endTime = NULL;
         }
     }
     
@@ -162,7 +178,7 @@ class Lesson{
             $this->class = $matches[1];
         }
         else{
-            $this->class = null;
+            $this->class = NULL;
         }
     }
     
@@ -177,7 +193,7 @@ class Lesson{
             $this->teacher = $teacherTemp[0];
         }
         else{
-            $this->teacher = null;
+            $this->teacher = NULL;
         }
     }
     
@@ -197,7 +213,7 @@ class Lesson{
             }
         }
         else {
-            $this->room = null;
+            $this->room = NULL;
         }
     }
     
@@ -207,7 +223,7 @@ class Lesson{
             $this->homework = $matches[1];
         }
         else {
-            $this->homework = null;
+            $this->homework = NULL;
         }
     }
     
@@ -217,7 +233,7 @@ class Lesson{
             $this->note = $matches[1]; 
         }
         else{
-            $this->note = null;
+            $this->note = NULL;
         }
     }  
 }
