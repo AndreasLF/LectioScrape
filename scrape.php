@@ -14,6 +14,8 @@ $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&e
 //creates html-DOM from the URL
 $html = file_get_html($lectioURL);
 
+$schedule = new ScheduleList(10);
+
 foreach($html->find('.s2skemabrik') as $element){
     $data = $element->getAttribute('data-additionalinfo');
        
@@ -22,6 +24,10 @@ foreach($html->find('.s2skemabrik') as $element){
         
         $lesson = new Lesson($data);
         
+        $schedule->addLesson($lesson);
+        
+        
+        /*
         echo "=================================================================<br>";
         echo $data . "<br>";
         echo "Status: " . $lesson->status . "<br>";
@@ -35,7 +41,7 @@ foreach($html->find('.s2skemabrik') as $element){
         echo "Homework: " . $lesson->homework . "<br>";
         echo "Note: " . $lesson->note . "<br>";
         echo "=================================================================<br>";
-        
+        */
      
         
         $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
@@ -60,6 +66,7 @@ foreach($html->find('.s2skemabrik') as $element){
     }
 }
 
+var_dump($schedule->scheduleList);
 
 
 /**
@@ -286,6 +293,33 @@ class Lesson{
     }  
 }
 
+/**
+* ScheduleList
+* This creates an object containing a list of lessons in a week
+*
+* @author Andreas Fiehn
+*/
+class ScheduleList{
+    public $weekNumber;
+    public $scheduleList; 
+    
+    /**
+    * This constructs the object by setting the $weekNumber and declaring $scheduleList an array
+    * @param Int $weekNo is the week number
+    */
+    function __construct($weekNo){
+        $this->weekNumber = $weekNo;
+        $this->scheduleList = array();
+    }
+    
+    /**
+    * This adds a lesson to the list of lessons
+    * @param Object $scheduleObject is the lesson object that is passed to the array.
+    */
+    public function addLesson($scheduleObject){
+        $this->scheduleList[] = $scheduleObject;
+    }
+}
 
 
 
