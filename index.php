@@ -5,37 +5,39 @@ session_start();
 
 $client = new Google_Client();
 $client->setAuthConfig('client_secret.json');
-$client->addScope(Google_Service_Calendar::CALENDAR_READONLY);
+$client->addScope(Google_Service_Calendar::CALENDAR);
 
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     $client->setAccessToken($_SESSION['access_token']);
   
     $service = new Google_Service_Calendar($client);
 
-    // Print the next 10 events on the user's calendar.
-    $calendarId = 'primary';    
-    $optParams = array(
-      'maxResults' => 10,
-      'orderBy' => 'startTime',
-      'singleEvents' => TRUE,
-      'timeMin' => date('c'),
-    );
+    $calendarList = $service->calendarList->listCalendarList();
     
-    $results = $service->events->listEvents($calendarId, $optParams);
-
-    if (count($results->getItems()) == 0) {
-      print "No upcoming events found.\n";
+    while(true) {
+    foreach ($calendarList->getItems() as $calendarListEntry) {
+        
+        if($calendarListEntry->getSummary()=="LectioSkema"){
+            echo "LectioSkema already exists in Google Calendar";
+        }
+        break;
+            
+    }
+        
+    $pageToken = $calendarList->getNextPageToken();
+        
+    if ($pageToken) {
+        $optParams = array('pageToken' => $pageToken);
+        $calendarList = $service->calendarList->listCalendarList($optParams);
     } 
     else {
-        print "Upcoming events:\n";
-        foreach ($results->getItems() as $event) {
-            $start = $event->start->dateTime;
-            if (empty($start)) {
-                $start = $event->start->date;
-            }
-        printf("%s (%s)\n", $event->getSummary(), $start);
-        }
-    }
+    echo "LectioSkema does not exist in Google Calendar";
+    break;
+  }
+}
+  
+    
+   
 
     
 } else {

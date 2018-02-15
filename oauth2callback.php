@@ -6,7 +6,7 @@ session_start();
 $client = new Google_Client();
 $client->setAuthConfigFile('client_secret.json');
 $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/oauth2callback.php');
-$client->addScope(Google_Service_Calendar::CALENDAR_READONLY);
+$client->addScope(Google_Service_Calendar::CALENDAR);
 
 if (! isset($_GET['code'])) {
   $auth_url = $client->createAuthUrl();
