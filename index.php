@@ -12,6 +12,9 @@ $client->setAuthConfig('client_secret.json');
 //Adds the Google calendar scope, that i want to acces in the API
 $client->addScope(Google_Service_Calendar::CALENDAR);
 
+$lectioCalendarExists = false;
+
+
 //Checks if the user's access token is stored in the session
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     
@@ -31,6 +34,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             //If the calendarListEntry
             if($calendarListEntry->getSummary()=="LectioSkema"){
                 echo "LectioSkema already exists in Google Calendar";
+                $lectioCalendarExists = true;
             }
 
             break;
@@ -51,9 +55,33 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
         } 
         else {
             echo "LectioSkema does not exist in Google Calendar";
+            $lectioCalendarExists = false;
         break;
       }
     }  
+    
+    
+    //If the calendar does not exist
+    if(! $lectioCalendarExists){
+        //Creates a new calendar objects
+        $calendar = new Google_Service_Calendar_Calendar(); 
+    }
+    
+    //sets the calendar's summary
+    $calendar->setSummary('LectioSkema');
+    //Sets the calendar's time zone
+    $calendar->setTimeZone('Europe/Copenhagen');
+
+    //Creates the calendar
+    $createdCalendar = $service->calendars->insert($calendar);
+
+    //Echoes the calendar id for the new calendar
+    echo $createdCalendar->getId();
+    
+    
+    
+    
+    
 } 
 else {
     //If no auth token is stored in the SESSION variable, the browser gets redirected to oauth2callback.php
