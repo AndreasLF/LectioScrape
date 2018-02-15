@@ -13,7 +13,7 @@ $client->setAuthConfig('client_secret.json');
 $client->addScope(Google_Service_Calendar::CALENDAR);
 
 $lectioCalendarExists = false;
-
+$calendarId;
 
 //Checks if the user's access token is stored in the session
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
@@ -35,6 +35,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             //If the calendarListEntry
             if($calendarListEntry->getSummary()=="LectioSkema"){
                 echo "LectioSkema already exists in Google Calendar";
+                $calendarId = $calendarListEntry->getId();
                 $lectioCalendarExists = true;
             }
             
@@ -72,10 +73,38 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
         $createdCalendar = $service->calendars->insert($calendar);
 
         //Echoes the calendar id for the new calendar
-        echo $createdCalendar->getId();
+        $calendarId = $createdCalendar->getId();
     }
     
     
+    $className = 'Matematik';
+    $description = 'DescriptionTest';
+    $startEvent = array(
+    'dateTime' => '2018-02-28T14:30:00',
+    'timeZone' => 'Europe/Copenhagen',
+    );
+    $endEvent = array(
+    'dateTime' => '2018-02-28T15:30:00',
+    'timeZone' => 'Europe/Copenhagen',
+    );
+    
+    
+    $eventParams = array(
+        'summary' => $className,
+        'description' => $description,
+        'start' => $startEvent,
+        'end' => $endEvent
+        );
+    
+    //Creates new event
+    $event = new Google_Service_Calendar_Event($eventParams);
+    
+    //Inserts the event to the calendar
+    $event = $service->events->insert($calendarId, $event);
+    
+    if($event){
+        echo 'event created successfully';
+    }
     
     
     
