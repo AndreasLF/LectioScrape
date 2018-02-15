@@ -27,6 +27,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     //Gets a calendar list
     $calendarList = $service->calendarList->listCalendarList();
     
+    //Checks if a calendar named 'LectioSkema' exists
     //Loops until a break occurs
     while(true) {
         foreach ($calendarList->getItems() as $calendarListEntry) {
@@ -36,9 +37,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
                 echo "LectioSkema already exists in Google Calendar";
                 $lectioCalendarExists = true;
             }
-
-            break;
-
+            
         }
 
         //Gets the next page token
@@ -54,29 +53,29 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             $calendarList = $service->calendarList->listCalendarList($optParams);
         } 
         else {
-            echo "LectioSkema does not exist in Google Calendar";
-            $lectioCalendarExists = false;
-        break;
-      }
+            break;
+        }
     }  
     
     
     //If the calendar does not exist
-    if(! $lectioCalendarExists){
+    if(!$lectioCalendarExists){
         //Creates a new calendar objects
         $calendar = new Google_Service_Calendar_Calendar(); 
+        
+        //sets the calendar's summary
+        $calendar->setSummary('LectioSkema');
+        //Sets the calendar's time zone
+        $calendar->setTimeZone('Europe/Copenhagen');
+
+        //Creates the calendar
+        $createdCalendar = $service->calendars->insert($calendar);
+
+        //Echoes the calendar id for the new calendar
+        echo $createdCalendar->getId();
     }
     
-    //sets the calendar's summary
-    $calendar->setSummary('LectioSkema');
-    //Sets the calendar's time zone
-    $calendar->setTimeZone('Europe/Copenhagen');
-
-    //Creates the calendar
-    $createdCalendar = $service->calendars->insert($calendar);
-
-    //Echoes the calendar id for the new calendar
-    echo $createdCalendar->getId();
+    
     
     
     
