@@ -6,7 +6,11 @@ require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 require_once __DIR__.'/scrape.php';
 
 
-session_start();
+//Starts session if it has not already been started
+if(!isset($_COOKIE["PHPSESSID"]))
+{
+  session_start();
+}
 
 //Creates a new Google Client object
 $client = new Google_Client();
