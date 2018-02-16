@@ -1,5 +1,10 @@
 <?php
 require_once __DIR__.'/vendor/autoload.php';
+require_once __DIR__.'/Lesson.class.php';
+require_once __DIR__.'/ScheduleList.class.php';
+require_once __DIR__.'/LessonGoogleCalEvent.class.php';
+require_once __DIR__.'/scrape.php';
+
 
 session_start();
 
@@ -106,7 +111,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
         echo 'event created successfully';
     }
     
-    
+
     
     
     

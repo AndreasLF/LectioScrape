@@ -8,6 +8,9 @@ require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 //Includes connection.php - connects to database
 include('connection.php');
 
+session_start();
+
+
 $schoolID = "681";
 $studentID = "14742506655";
 $weekNumber = "102018";
@@ -50,7 +53,27 @@ foreach($html->find('.s2skemabrik') as $element){
         */
      
         
-        $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
+    
+        
+        
+    }
+}
+
+
+sendScheduleToDatabase($schedule->scheduleList,$connection);
+
+var_dump($schedule->scheduleList);
+var_dump($scheduleGoogle->scheduleList);
+
+
+/**
+* Sends the schedule to the MySQL database
+* @param $scheduleList is list of lesson to upload.
+* @param $conn is the database connection
+*/
+function sendScheduleToDatabase($scheduleList,$conn){
+    foreach($scheduleList as $lesson){
+        $stmt = mysqli_prepare($conn,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
         
         $stmt->bind_param("sssssssssss",$weekNumber,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); //Binds parameters to the prepared statement. Every parameter is of type String
         
@@ -62,18 +85,13 @@ foreach($html->find('.s2skemabrik') as $element){
             
         }
         else{ //If $result is false (mysqli_query was unsuccesful)
-            echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
+            echo "<br>ERROR executing: $query"."<br>".mysqli_error($conn)."<br><br>"; //An error message is created and echoed to screen
         }
         
         
-        $stmt->close(); //Closes the prepared statement
-        
-        
-    }
+        $stmt->close(); //Closes the prepared statement 
+    }   
 }
-
-//var_dump($schedule->scheduleList);
-var_dump($scheduleGoogle->scheduleList);
 
 
 
