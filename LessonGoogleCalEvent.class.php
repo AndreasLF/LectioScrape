@@ -1,31 +1,52 @@
 <?php
 
+
+/**
+* LessonGoogleCalEvent
+* This creates an object readable by the Google Calendar API from the Lesson object
+*
+* @author Andreas Fiehn 
+*/
 class LessonGoogleCalEvent{
-    public $summary;
-    public $description;
-    public $startEvent;
-    public $endEvent;
+    /** @var array $eventParams */
+    //These are the Google Calendar event parameters, which can be passed to the Google Calendar API
+    public $eventParams;
     
-    
+    /**
+    * Constructs the Google event object
+    * @param $lessonObject is the object from which the calendar event is created from
+    */
     function __construct($lessonObject){
-        $this->setSummary($lessonObject);
-        $this->setDescription($lessonObject);
-        $this->setStartEvent($lessonObject);
-        $this->setEndEvent($lessonObject);
+        $this->eventParams = array(
+        'summary' => $this->setSummary($lessonObject),
+        'description' => $this->setDescription($lessonObject),
+        'start' => $this->setStartEvent($lessonObject),
+        'end' => $this->setEndEvent($lessonObject)
+        );
     }
     
     
+    /**
+    * Returns the lesson's summary
+    * @param $lessonObject is the lesson object created from the Lesson class
+    * @return string
+    */
     private function setSummary($lessonObject){
         if($lessonObject->class){
-            $this->summary = $lessonObject->class;     
+            return $lessonObject->class;     
         }
         else{
-            $this->summary = $lessonObject->description;
+            return $lessonObject->description;
         }
        
         
     }
     
+    /**
+    * Returns the lesson description
+    * @param $lessonObject is the lesson object created from the Lesson class
+    * @return string
+    */
     private function setDescription($lessonObject){
         
         $descriptionArray = array();
@@ -56,26 +77,31 @@ class LessonGoogleCalEvent{
         }
         
         
-        $descriptionString;
+        $descriptionString = "";
     
         foreach($descriptionArray as $desc){
-            $description = $desc . "<br>";
+            $descriptionString = $descriptionString . $desc . "<br>";
             
         }
         
-        $this->description = $description;
+        return $descriptionString;
     }
     
+    /**
+    * Returns the start time and timezone of the lesson 
+    * @param $lessonObject is the lesson object created from the Lesson class
+    * @return array
+    */
     private function setStartEvent($lessonObject){
         
         if($lessonObject->startTime){
-            $this->startEvent = array(
+            return array(
             'dateTime' => $lessonObject->date.'T'.$lessonObject->startTime,
             'timeZone' => 'Europe/Copenhagen',
             );
         }
         else {
-            $this->startEvent = array(
+            return array(
             'date' => $lessonObject->date,
             'timeZone' => 'Europe/Copenhagen',
             );
@@ -83,16 +109,21 @@ class LessonGoogleCalEvent{
             
     }
     
+     /**
+    *  Returns the start time and timezone of the lesson 
+    * @param $lessonObject is the lesson object created from the Lesson class
+    * @return string
+    */
     private function setEndEvent($lessonObject){
         
          if($lessonObject->endTime){
-            $this->endEvent = array(
+            return array(
             'dateTime' => $lessonObject->date.'T'.$lessonObject->endTime,
             'timeZone' => 'Europe/Copenhagen',
             );
         }
         else {
-            $this->endEvent = array(
+            return array(
             'date' => $lessonObject->date,
             'timeZone' => 'Europe/Copenhagen',
             );
