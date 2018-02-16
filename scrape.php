@@ -3,6 +3,7 @@
 require_once __DIR__.'/simple_html_dom.php';
 require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/ScheduleList.class.php';
+require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 
 //Includes connection.php - connects to database
 include('connection.php');
@@ -17,6 +18,7 @@ $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&e
 $html = file_get_html($lectioURL);
 
 $schedule = new ScheduleList(10);
+$scheduleGoogle = new ScheduleList(10);
 
 foreach($html->find('.s2skemabrik') as $element){
     $data = $element->getAttribute('data-additionalinfo');
@@ -25,8 +27,10 @@ foreach($html->find('.s2skemabrik') as $element){
     if(!(preg_match('/(\d\d|\d)\/(\d\d|\d)-(\d\d\d\d)/', $data, $dateArr)==0)){
         
         $lesson = new Lesson($data);
+        $lessonGoogle = new LessonGoogleCalEvent($lesson);
         
         $schedule->addLesson($lesson);
+        $scheduleGoogle->addLesson($lessonGoogle);
         
         
         /*
@@ -68,7 +72,9 @@ foreach($html->find('.s2skemabrik') as $element){
     }
 }
 
-var_dump($schedule->scheduleList);
+//var_dump($schedule->scheduleList);
+var_dump($scheduleGoogle->scheduleList);
+
 
 
 

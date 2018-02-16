@@ -104,7 +104,7 @@ class Lesson{
             $yyyy = $matches[3];
 
             //The date property is updated to contain the date in the correct format
-            $this->date = $yyyy.$mm.$dd;  
+            $this->date = $yyyy."-".$mm."-".$dd;  
         }
         else{
             $this->date = NULL;
@@ -124,8 +124,8 @@ class Lesson{
             $endTimeArray = preg_split("/[:]+/",$matches[2]);
             
             //Concatenates the results and adds '00' to the end to make sure the format is correct
-            $this->startTime = $startTimeArray[0].$startTimeArray[1]."00";
-            $this->endTime= $endTimeArray[0].$endTimeArray[1]."00";
+            $this->startTime = $startTimeArray[0].":".$startTimeArray[1].":"."00";
+            $this->endTime= $endTimeArray[0].":".$endTimeArray[1].":"."00";
         }
         else{
             $this->startTime = NULL;
