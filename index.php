@@ -3,7 +3,7 @@ require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/ScheduleList.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
-//require_once __DIR__.'/scrape.php';
+require_once __DIR__.'/scrape.php';
 
 session_start();
 
@@ -83,8 +83,9 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     
     
     
-    
-    sendToGoogleCal($_SESSION['scheduleGoogle']);
+    scrapeLectio('102018');
+    sendToGoogleCal($_SESSION['scheduleGoogle'],$service,$calendarId);
+    //var_dump($_SESSION['scheduleGoogle']->scheduleList);
     
     
 } 
@@ -101,10 +102,11 @@ else {
 * @param $scheduleList is an object created from the LessonGoogleCalEvent class
 */
 
-function sendToGoogleCal($scheduleList){
-    foreach($scheduleList->eventParams as $eventParams) {
+
+function sendToGoogleCal($scheduleList,$service,$calendarId){
+    foreach($scheduleList->scheduleList as $list) {
         //Creates new event
-        $event = new Google_Service_Calendar_Event($scheduleEvent->eventParams);
+        $event = new Google_Service_Calendar_Event($list->eventParams);
 
 
         //Inserts the event to the calendar

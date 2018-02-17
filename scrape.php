@@ -5,66 +5,67 @@ require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/ScheduleList.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 
-//Includes connection.php - connects to database
-include('connection.php');
 
-session_start();
-
-
-
-
-$schoolID = "681";
-$studentID = "14742506655";
-$weekNumber = "102018";
-$lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekNumber;
-
-
-//creates html-DOM from the URL
-$html = file_get_html($lectioURL);
-
-$schedule = new ScheduleList(10);
-$scheduleGoogle = new ScheduleList(10);
-
-foreach($html->find('.s2skemabrik') as $element){
-    $data = $element->getAttribute('data-additionalinfo');
-       
-    //Peforms af regular expression to check if the class has a date. If not it wont be processed
-    if(!(preg_match('/(\d\d|\d)\/(\d\d|\d)-(\d\d\d\d)/', $data, $dateArr)==0)){
-        
-        $lesson = new Lesson($data);
-        $lessonGoogle = new LessonGoogleCalEvent($lesson);
-        
-        $schedule->addLesson($lesson);
-        $scheduleGoogle->addLesson($lessonGoogle);
-        
-        
-        /*
-        echo "=================================================================<br>";
-        echo $data . "<br>";
-        echo "Status: " . $lesson->status . "<br>";
-        echo "Description: " . $lesson->description . "<br>";
-        echo "Date: " . $lesson->date . "<br>";
-        echo "Start time: " . $lesson->startTime . "<br>";
-        echo "End time: " . $lesson->endTime . "<br>";
-        echo "Class: " . $lesson->class . "<br>";
-        echo "Teacher: " . $lesson->teacher . "<br>";
-        echo "Room: " . $lesson->room . "<br>";
-        echo "Homework: " . $lesson->homework . "<br>";
-        echo "Note: " . $lesson->note . "<br>";
-        echo "=================================================================<br>";
-        */
-     
-        
+/**
+* This function scrapes the schedule for one week on lectio.dk
+* @param string $weekNumber is the week you want to scrape
+*/
+function scrapeLectio($weekNumber){
     
-        
-        
+    $schoolID = "681";
+    $studentID = "14742506655";
+    $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekNumber;
+
+
+    //creates html-DOM from the URL
+    $html = file_get_html($lectioURL);
+
+    $schedule = new ScheduleList(10);
+    $scheduleGoogle = new ScheduleList(10);
+
+    foreach($html->find('.s2skemabrik') as $element){
+        $data = $element->getAttribute('data-additionalinfo');
+
+        //Peforms af regular expression to check if the class has a date. If not it wont be processed
+        if(!(preg_match('/(\d\d|\d)\/(\d\d|\d)-(\d\d\d\d)/', $data, $dateArr)==0)){
+
+            $lesson = new Lesson($data);
+            $lessonGoogle = new LessonGoogleCalEvent($lesson);
+
+            $schedule->addLesson($lesson);
+            $scheduleGoogle->addLesson($lessonGoogle);
+
+
+            /*
+            echo "=================================================================<br>";
+            echo $data . "<br>";
+            echo "Status: " . $lesson->status . "<br>";
+            echo "Description: " . $lesson->description . "<br>";
+            echo "Date: " . $lesson->date . "<br>";
+            echo "Start time: " . $lesson->startTime . "<br>";
+            echo "End time: " . $lesson->endTime . "<br>";
+            echo "Class: " . $lesson->class . "<br>";
+            echo "Teacher: " . $lesson->teacher . "<br>";
+            echo "Room: " . $lesson->room . "<br>";
+            echo "Homework: " . $lesson->homework . "<br>";
+            echo "Note: " . $lesson->note . "<br>";
+            echo "=================================================================<br>";
+            */
+
+
+
+
+
+        }
     }
+
+    //var_dump($schedule->scheduleList);
+    //var_dump($scheduleGoogle->scheduleList);
+
+    $_SESSION['scheduleGoogle'] = $scheduleGoogle;
+       
 }
 
-//var_dump($schedule->scheduleList);
-//var_dump($scheduleGoogle->scheduleList);
-
-$_SESSION['scheduleGoogle'] = $scheduleGoogle;
 
 
 /**
@@ -73,6 +74,9 @@ $_SESSION['scheduleGoogle'] = $scheduleGoogle;
 * @param $conn is the database connection
 */
 function sendScheduleToDatabase($scheduleList,$conn){
+    //Includes connection.php - connects to database
+    require_once __DIR__.'/connection.php';
+
     foreach($scheduleList as $lesson){
         $stmt = mysqli_prepare($conn,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
         
