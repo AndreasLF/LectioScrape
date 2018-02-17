@@ -8,11 +8,8 @@ require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 //Includes connection.php - connects to database
 include('connection.php');
 
-//Starts session if it has not already been started
-if(!isset($_COOKIE["PHPSESSID"]))
-{
-  session_start();
-}
+session_start();
+
 
 
 
@@ -64,8 +61,10 @@ foreach($html->find('.s2skemabrik') as $element){
     }
 }
 
-var_dump($schedule->scheduleList);
-var_dump($scheduleGoogle->scheduleList);
+//var_dump($schedule->scheduleList);
+//var_dump($scheduleGoogle->scheduleList);
+
+$_SESSION['scheduleGoogle'] = $scheduleGoogle;
 
 
 /**

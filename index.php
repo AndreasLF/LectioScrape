@@ -3,14 +3,10 @@ require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/ScheduleList.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
-require_once __DIR__.'/scrape.php';
+//require_once __DIR__.'/scrape.php';
 
+session_start();
 
-//Starts session if it has not already been started
-if(!isset($_COOKIE["PHPSESSID"]))
-{
-  session_start();
-}
 
 //Creates a new Google Client object
 $client = new Google_Client();
@@ -86,37 +82,9 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     }
     
     
-    $className = 'Matematik';
-    $description = 'DescriptionTest';
-    $startEvent = array(
-    'dateTime' => '2018-02-28T14:30:00',
-    'timeZone' => 'Europe/Copenhagen',
-    );
-    $endEvent = array(
-    'dateTime' => '2018-02-28T15:30:00',
-    'timeZone' => 'Europe/Copenhagen',
-    );
     
     
-    $eventParams = array(
-        'summary' => $className,
-        'description' => $description,
-        'start' => $startEvent,
-        'end' => $endEvent
-        );
-    
-    //Creates new event
-    $event = new Google_Service_Calendar_Event($eventParams);
-    
-    //Inserts the event to the calendar
-    $event = $service->events->insert($calendarId, $event);
-    
-    if($event){
-        echo 'event created successfully';
-    }
-    
-
-    
+    sendToGoogleCal($_SESSION['scheduleGoogle']);
     
     
 } 
@@ -125,3 +93,28 @@ else {
     $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/oauth2callback.php';
     header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 }
+
+
+
+/**
+* Sends the schedule to Google calendar
+* @param $scheduleList is an object created from the LessonGoogleCalEvent class
+*/
+
+function sendToGoogleCal($scheduleList){
+    foreach($scheduleList->eventParams as $eventParams) {
+        //Creates new event
+        $event = new Google_Service_Calendar_Event($scheduleEvent->eventParams);
+
+
+        //Inserts the event to the calendar
+        $event = $service->events->insert($calendarId, $event);
+
+        if($event){
+            echo 'event created successfully';
+        }
+    }
+}
+
+
+?>

@@ -1,11 +1,7 @@
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
-//Starts session if it has not already been started
-if(!isset($_COOKIE["PHPSESSID"]))
-{
-  session_start();
-}
+session_start();
 
 $client = new Google_Client();
 $client->setAuthConfigFile('client_secret.json');
