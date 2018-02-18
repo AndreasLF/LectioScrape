@@ -38,7 +38,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
             //If the calendarListEntry
             if($calendarListEntry->getSummary()=="LectioSkema"){
-                echo "LectioSkema already exists in Google Calendar";
+                echo "LectioSkema already exists in Google Calendar <br>";
                 $calendarId = $calendarListEntry->getId();
                 $lectioCalendarExists = true;
             }
@@ -83,8 +83,10 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     
  
 
+    $weekArr = getWeekStartAndEndDate(2018,10);
+    echo $weekArr['weekStart'] . "<br>" . $weekArr['weekEnd'];
     
-    deleteWeek($service,$calendarId);
+    //deleteWeek($service,$calendarId);
     //scrapeLectio('102018');
     //sendToGoogleCal($_SESSION['scheduleGoogle'],$service,$calendarId);
     //var_dump($_SESSION['scheduleGoogle']->scheduleList);
@@ -169,6 +171,36 @@ function deleteEvents($startDate,$endDate,$service,$calendarId){
         }
         
     }
+}
+
+
+/**
+* Gets the start and end date by specifying year and week number
+*
+* @param int $year is the year
+* @param int $weekNumber is the weeknumber
+* 
+* @return array containing weekStart and weekEnd 
+*/
+
+function getWeekStartAndEndDate($year,$weekNumber){
+    
+    //Creates a new dateTime object
+    $dateTimeObject = new DateTime();
+    
+    //Sets the date by usin the ISO 8601 standard, specifying year and weekn number
+    $dateTimeObject->setISODate($year,$weekNumber);
+    
+    //Saves start date in an array
+    $dateRangeArray['weekStart'] = $dateTimeObject->format('Y-m-d');
+    
+    //Add 6 days to the dateTime object
+    $dateTimeObject->modify('+6 days');
+    
+    //Saves the new date in an array as the end date
+     $dateRangeArray['weekEnd'] = $dateTimeObject->format('Y-m-d');
+    
+    return $dateRangeArray;
 }
 
 
