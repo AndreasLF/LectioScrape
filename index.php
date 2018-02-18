@@ -120,14 +120,17 @@ function sendToGoogleCal($scheduleList,$service,$calendarId){
 
 
 /**
-* Delete every event in the calendar for a specified week
+* Delete every event in the calendar between (including) $startDate and $endDate
+*
+* @param string $startDate is the start date in the following format: 'YYYY-MM-DD'
+* @param string $endDate is the end date in the following format: 'YYYY-MM-DD'
 * @param $service Google_Service_Calendar object
 * @param $calendarId Google calendarId
 */
-function deleteWeek($service,$calendarId){
+function deleteEvents($startDate,$endDate,$service,$calendarId){
     //Specify minimum and maximum time to search for
-    $timeMin = '2018-03-03T00:00:00+01:00';
-    $timeMax = '2018-03-11T23:59:00+01:00';
+    $timeMin = $startDate . 'T00:00:00+01:00';
+    $timeMax = $endDate . 'T23:59:59+01:00';
     
     //Saves the timeMin and timeMax parameters in an array
     $optParams = array('timeMin' => $timeMin, 'timeMax'=>$timeMax);
