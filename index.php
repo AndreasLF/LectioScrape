@@ -101,7 +101,10 @@ else {
 
 /**
 * Sends the schedule to Google calendar
+* 
 * @param $scheduleList is an object created from the LessonGoogleCalEvent class
+* @param $service Google_Service_Calendar object
+* @param $calendarId Google calendarId
 */
 function sendToGoogleCal($scheduleList,$service,$calendarId){
     foreach($scheduleList->scheduleList as $list) {
@@ -113,7 +116,7 @@ function sendToGoogleCal($scheduleList,$service,$calendarId){
         $event = $service->events->insert($calendarId, $event);
 
         if($event){
-            echo 'event created successfully';
+            echo 'event created successfully<br>';
         }
     }
 }
