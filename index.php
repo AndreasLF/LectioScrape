@@ -7,7 +7,6 @@ require_once __DIR__.'/scrape.php';
 
 session_start();
 
-
 //Creates a new Google Client object
 $client = new Google_Client();
 
@@ -82,9 +81,32 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     }
     
     
+    //Specifies minimum and maximum time to search for
+    $timeMin = '2018-03-03T00:00:00+01:00';
+    $timeMax = '2018-03-11T23:59:00+01:00';
     
-    scrapeLectio('102018');
-    sendToGoogleCal($_SESSION['scheduleGoogle'],$service,$calendarId);
+    $optParams = array('timeMin' => $timeMin, 'timeMax'=>$timeMax);
+    
+    $events = $service->events->listEvents($calendarId,$optParams);
+    
+    while(true) {
+        foreach ($events->getItems() as $event) {
+            echo $event->getSummary();
+        }
+        $pageToken = $events->getNextPageToken();
+        if ($pageToken) {
+            $optParams = array('pageToken' => $pageToken,'timeMin' => $timeMin, 'timeMax'=>$timeMax);
+            $events = $service->events->listEvents($calendarId, $optParams);
+        } 
+        else {
+            break;
+        }
+    }
+
+    
+    
+    //scrapeLectio('102018');
+    //sendToGoogleCal($_SESSION['scheduleGoogle'],$service,$calendarId);
     //var_dump($_SESSION['scheduleGoogle']->scheduleList);
     
     
