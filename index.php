@@ -81,30 +81,10 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     }
     
     
-    //Specifies minimum and maximum time to search for
-    $timeMin = '2018-03-03T00:00:00+01:00';
-    $timeMax = '2018-03-11T23:59:00+01:00';
-    
-    $optParams = array('timeMin' => $timeMin, 'timeMax'=>$timeMax);
-    
-    $events = $service->events->listEvents($calendarId,$optParams);
-    
-    while(true) {
-        foreach ($events->getItems() as $event) {
-            echo $event->getSummary();
-        }
-        $pageToken = $events->getNextPageToken();
-        if ($pageToken) {
-            $optParams = array('pageToken' => $pageToken,'timeMin' => $timeMin, 'timeMax'=>$timeMax);
-            $events = $service->events->listEvents($calendarId, $optParams);
-        } 
-        else {
-            break;
-        }
-    }
+ 
 
     
-    
+    deleteWeek($service,$calendarId);
     //scrapeLectio('102018');
     //sendToGoogleCal($_SESSION['scheduleGoogle'],$service,$calendarId);
     //var_dump($_SESSION['scheduleGoogle']->scheduleList);
@@ -123,8 +103,6 @@ else {
 * Sends the schedule to Google calendar
 * @param $scheduleList is an object created from the LessonGoogleCalEvent class
 */
-
-
 function sendToGoogleCal($scheduleList,$service,$calendarId){
     foreach($scheduleList->scheduleList as $list) {
         //Creates new event
@@ -137,6 +115,53 @@ function sendToGoogleCal($scheduleList,$service,$calendarId){
         if($event){
             echo 'event created successfully';
         }
+    }
+}
+
+
+/**
+* Delete every event in the calendar for a specified week
+* @param $service Google_Service_Calendar object
+* @param $calendarId Google calendarId
+*/
+function deleteWeek($service,$calendarId){
+    //Specify minimum and maximum time to search for
+    $timeMin = '2018-03-03T00:00:00+01:00';
+    $timeMax = '2018-03-11T23:59:00+01:00';
+    
+    //Saves the timeMin and timeMax parameters in an array
+    $optParams = array('timeMin' => $timeMin, 'timeMax'=>$timeMax);
+    
+    //creates the events list
+    $events = $service->events->listEvents($calendarId,$optParams);
+    
+    //Deletes every event in the events list
+    //Loops until a break occurs
+    while(true) {
+        foreach ($events->getItems() as $event) {
+            //Gets the event id
+            $eventId = $event->getId();
+            //Deletes the event
+            $service->events->delete($calendarId, $eventId);
+        }
+        
+        //Gets the next page token
+        $pageToken = $events->getNextPageToken();
+        
+        //If more calendarList pages exist ($pageToken == true)
+        if ($pageToken) {
+            
+            //The page token is added to the optParams
+            $optParams = array('pageToken' => $pageToken,'timeMin' => $timeMin, 'timeMax'=>$timeMax);
+            
+            //A new list of events is created
+            $events = $service->events->listEvents($calendarId, $optParams);
+        } 
+        else {
+            //Break free from while loop if no more pages exist 
+            break;
+        }
+        
     }
 }
 
