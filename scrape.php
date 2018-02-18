@@ -6,15 +6,22 @@ require_once __DIR__.'/ScheduleList.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 
 
+
+scrapeLectio("102018");   
+
+var_dump($_SESSION['schedule']->scheduleList);
+sendScheduleToDatabase($_SESSION['schedule']->scheduleList);
+
 /**
 * This function scrapes the schedule for one week on lectio.dk
 * @param string $weekNumber is the week you want to scrape
 */
 function scrapeLectio($weekNumber){
     
+    $weekNumberStr = (string)$weekNumber;
     $schoolID = "681";
     $studentID = "14742506655";
-    $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekNumber;
+    $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekNumberStr;
 
 
     //creates html-DOM from the URL
@@ -62,23 +69,23 @@ function scrapeLectio($weekNumber){
     //var_dump($schedule->scheduleList);
     //var_dump($scheduleGoogle->scheduleList);
 
+    $_SESSION['schedule'] = $schedule;
     $_SESSION['scheduleGoogle'] = $scheduleGoogle;
-       
+    
 }
 
 
 
 /**
 * Sends the schedule to the MySQL database
-* @param $scheduleList is list of lesson to upload.
-* @param $conn is the database connection
+* @param $scheduleList is list of lessons to upload.
 */
-function sendScheduleToDatabase($scheduleList,$conn){
+function sendScheduleToDatabase($scheduleList){
     //Includes connection.php - connects to database
     require_once __DIR__.'/connection.php';
 
     foreach($scheduleList as $lesson){
-        $stmt = mysqli_prepare($conn,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
+        $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
         
         $stmt->bind_param("sssssssssss",$weekNumber,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); //Binds parameters to the prepared statement. Every parameter is of type String
         
@@ -90,7 +97,7 @@ function sendScheduleToDatabase($scheduleList,$conn){
             
         }
         else{ //If $result is false (mysqli_query was unsuccesful)
-            echo "<br>ERROR executing: $query"."<br>".mysqli_error($conn)."<br><br>"; //An error message is created and echoed to screen
+            echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
         }
         
         
