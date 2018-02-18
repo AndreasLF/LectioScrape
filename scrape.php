@@ -7,14 +7,15 @@ require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 
 
 
-scrapeLectio("102018");   
-
-var_dump($_SESSION['schedule']->scheduleList);
-sendScheduleToDatabase($_SESSION['schedule']->scheduleList);
+var_dump(scrapeLectio("102018")['schedule']->scheduleList);
+//sendScheduleToDatabase($_SESSION['schedule']->scheduleList);
 
 /**
 * This function scrapes the schedule for one week on lectio.dk
+*
 * @param string $weekNumber is the week you want to scrape
+*
+* @return array containing the schedule for one week in two formats - schedule (MySQL-ready) and scheduleGoogle (Google Cal-ready) 
 */
 function scrapeLectio($weekNumber){
     
@@ -41,37 +42,10 @@ function scrapeLectio($weekNumber){
 
             $schedule->addLesson($lesson);
             $scheduleGoogle->addLesson($lessonGoogle);
-
-
-            /*
-            echo "=================================================================<br>";
-            echo $data . "<br>";
-            echo "Status: " . $lesson->status . "<br>";
-            echo "Description: " . $lesson->description . "<br>";
-            echo "Date: " . $lesson->date . "<br>";
-            echo "Start time: " . $lesson->startTime . "<br>";
-            echo "End time: " . $lesson->endTime . "<br>";
-            echo "Class: " . $lesson->class . "<br>";
-            echo "Teacher: " . $lesson->teacher . "<br>";
-            echo "Room: " . $lesson->room . "<br>";
-            echo "Homework: " . $lesson->homework . "<br>";
-            echo "Note: " . $lesson->note . "<br>";
-            echo "=================================================================<br>";
-            */
-
-
-
-
-
         }
     }
 
-    //var_dump($schedule->scheduleList);
-    //var_dump($scheduleGoogle->scheduleList);
-
-    $_SESSION['schedule'] = $schedule;
-    $_SESSION['scheduleGoogle'] = $scheduleGoogle;
-    
+    return array('schedule' => $schedule,'scheduleGoogle' => $scheduleGoogle);    
 }
 
 
