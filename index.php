@@ -188,7 +188,7 @@ function getWeekStartAndEndDate($year,$weekNumber){
     //Creates a new dateTime object
     $dateTimeObject = new DateTime();
     
-    //Sets the date by usin the ISO 8601 standard, specifying year and weekn number
+    //Sets the date by using the ISO 8601 standard, specifying year and week number
     $dateTimeObject->setISODate($year,$weekNumber);
     
     //Saves start date in an array
