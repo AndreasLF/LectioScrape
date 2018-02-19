@@ -1,11 +1,14 @@
 <?php
+session_start();
+
+
 require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/ScheduleList.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 require_once __DIR__.'/scrape.php';
 
-session_start();
+
 
 //Creates a new Google Client object
 $client = new Google_Client();
@@ -18,6 +21,11 @@ $client->addScope(Google_Service_Calendar::CALENDAR);
 
 $lectioCalendarExists = false;
 $calendarId;
+
+//$weekArr = getWeekStartAndEndDate(2018,10);
+//echo $weekArr['weekStart'] . "<br>" . $weekArr['weekEnd'];
+
+echo getWeekNumberFromDate('2018-02-19T00:00:00');
 
 //Checks if the user's access token is stored in the session
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
@@ -83,8 +91,8 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     
  
 
-    $weekArr = getWeekStartAndEndDate(2018,10);
-    echo $weekArr['weekStart'] . "<br>" . $weekArr['weekEnd'];
+    
+    
     
     //deleteWeek($service,$calendarId);
     //scrapeLectio('102018');
@@ -96,8 +104,9 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 else {
     //If no auth token is stored in the SESSION variable, the browser gets redirected to oauth2callback.php
     $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/oauth2callback.php';
-    header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+    //header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 }
+
 
 
 
@@ -202,6 +211,23 @@ function getWeekStartAndEndDate($year,$weekNumber){
     
     return $dateRangeArray;
 }
+
+
+
+/**
+* Gets the week number by specifying a date in the week
+*
+* @param string $date is the date
+*
+* @return string week number
+*/
+function getWeekNumberFromDate($date){
+    
+    $dateTimeObject = new DateTime($date);
+    $weekNumber = $dateTimeObject->format("W");
+    return $weekNumber; 
+}
+
 
 
 ?>
