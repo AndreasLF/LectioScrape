@@ -2,8 +2,11 @@
 $eventList = array();
 
 
+$start = $_GET['start'];
+$end = $_GET['end'];
+
 $eventList[] =   array(
-    'title'=>'TEST1',
+    'title'=>$end,
     'allday'=>false,
     'borderColor'=>'#429ef4',
     'color'=>'#429ef4',
