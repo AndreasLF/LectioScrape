@@ -21,14 +21,17 @@
             // page is now ready, initialize the calendar...
 
             $('#calendar').fullCalendar({
+                events: 'fullcalendarFeed.php',
                 header: {
-                    left: '',
+                    left: 'prev',
                     center: '',
-                    right: ''
+                    right: 'next'
                 },
-                defaultView: 'basicWeek',
-                themeSystem: 'bootstrap3',
-                weekNumber: true
+                defaultView: 'agendaWeek',
+                minTime: '07:00:00',
+                maxTime: '19:00:00',
+                themeSystem: 'standard',
+                displayEventTime: true
             })
 
         });
