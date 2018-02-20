@@ -7,8 +7,12 @@ require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 
 
 
-var_dump(scrapeLectio("102018")['schedule']->scheduleList);
+//var_dump(scrapeLectio("102018")['schedule']->scheduleList);
+//var_dump(scrapeLectio("102018")['scheduleGoogle']->scheduleList);
 //sendScheduleToDatabase($_SESSION['schedule']->scheduleList);
+
+var_dump(scrapeLectio('T23:59:59+01:00')['schedule']);
+
 
 /**
 * This function scrapes the schedule for one week on lectio.dk
@@ -17,12 +21,14 @@ var_dump(scrapeLectio("102018")['schedule']->scheduleList);
 *
 * @return array containing the schedule for one week in two formats - schedule (MySQL-ready) and scheduleGoogle (Google Cal-ready) 
 */
-function scrapeLectio($weekNumber){
+function scrapeLectio($date){
     
-    $weekNumberStr = (string)$weekNumber;
+    $date = getWeekNumberFromDate($date);
+    
+    $weekID = $date['weekNumber'].$date['year'];
     $schoolID = "681";
     $studentID = "14742506655";
-    $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekNumberStr;
+    $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekID;
 
 
     //creates html-DOM from the URL
@@ -79,6 +85,52 @@ function sendScheduleToDatabase($scheduleList){
     }   
 }
 
+
+
+/**
+* Gets the start and end date by specifying year and week number
+*
+* @param int $year is the year
+* @param int $weekNumber is the weeknumber
+* 
+* @return array containing weekStart and weekEnd 
+*/
+function getWeekStartAndEndDate($year,$weekNumber){
+    
+    //Creates a new dateTime object
+    $dateTimeObject = new DateTime();
+    
+    //Sets the date by using the ISO 8601 standard, specifying year and week number
+    $dateTimeObject->setISODate($year,$weekNumber);
+    
+    //Saves start date in an array
+    $dateRangeArray['weekStart'] = $dateTimeObject->format('Y-m-d');
+    
+    //Add 6 days to the dateTime object
+    $dateTimeObject->modify('+6 days');
+    
+    //Saves the new date in an array as the end date
+     $dateRangeArray['weekEnd'] = $dateTimeObject->format('Y-m-d');
+    
+    return $dateRangeArray;
+}
+
+
+
+/**
+* Gets the week number by specifying a date in the week
+*
+* @param string $date is the date
+*
+* @return array containing weekNumber and year
+*/
+function getWeekNumberFromDate($date){
+    
+    $dateTimeObject = new DateTime($date);
+    $weekNumber = $dateTimeObject->format("W");
+    $year = $dateTimeObject->format("Y");
+    return array('weekNumber' => $weekNumber,'year' => $year); 
+}
 
 
 
