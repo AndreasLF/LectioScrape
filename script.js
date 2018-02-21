@@ -28,7 +28,21 @@ $(document).ready(function() {
             })
     
     
-        
+            $("#googleButton").click(function(){
+                
+                //Gets the current view from the calendar
+                var view = $('#calendar').fullCalendar('getView'); 
+                
+                //Formats the start date in the view with Moment
+                var startDate = view.start.format();
+                
+                //Formats the end date in the view with Moment
+                var endDate = view.end.format();
+                
+                //Open uploadToGoogleCal.php and pass startDate and endDate via $_GET
+                window.location.replace("setDatesSession.php?startDate=" + startDate + "&endDate=" + endDate );
+
+            });
 
         });
 

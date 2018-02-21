@@ -1,11 +1,12 @@
 <?php
-
-
 session_start();
+
+
 require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 require_once __DIR__.'/LectioScrape.class.php';
+
 
 
 //Creates a new Google Client object
@@ -20,11 +21,9 @@ $client->addScope(Google_Service_Calendar::CALENDAR);
 $lectioCalendarExists = false;
 $calendarId;
 
-//$weekArr = getWeekStartAndEndDate(2018,10);
-//echo $weekArr['weekStart'] . "<br>" . $weekArr['weekEnd'];
-
 //Checks if the user's access token is stored in the session
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
+    
     
     //The access token is set in the client object
     $client->setAccessToken($_SESSION['access_token']);
@@ -40,7 +39,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     while(true) {
         foreach ($calendarList->getItems() as $calendarListEntry) {
 
-            //If the calendarListEntry
+            //If the calendarListEntry is LectioSkema
             if($calendarListEntry->getSummary()=="LectioSkema"){
                 echo "LectioSkema already exists in Google Calendar <br>";
                 $calendarId = $calendarListEntry->getId();
@@ -82,16 +81,20 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
         //Echoes the calendar id for the new calendar
         $calendarId = $createdCalendar->getId();
+        
+        echo "LectioSkema created successfully";
     }
     
     
- 
-
     
-     $schedule = new LectioScrape('2018-02-21T10:50:31');
-
     
+    
+    
+   
+    deleteEvents($_SESSION['startDate'],$_SESSION['endDate'],$service,$calendarId);
+    $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
     sendToGoogleCal($schedule->scheduleGoogle,$service,$calendarId);
+    
     
     
     //deleteWeek($service,$calendarId);
@@ -104,7 +107,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 else {
     //If no auth token is stored in the SESSION variable, the browser gets redirected to oauth2callback.php
     $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/oauth2callback.php';
-    //header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+    header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 }
 
 
@@ -113,12 +116,12 @@ else {
 /**
 * Sends the schedule to Google calendar
 * 
-* @param $scheduleList is an object created from the LessonGoogleCalEvent class
+* @param $scheduleList is a list of objects created from the LessonGoogleCalEvent class
 * @param $service Google_Service_Calendar object
 * @param $calendarId Google calendarId
 */
 function sendToGoogleCal($scheduleList,$service,$calendarId){
-    foreach($scheduleList->scheduleList as $list) {
+    foreach($scheduleList as $list) {
         //Creates new event
         $event = new Google_Service_Calendar_Event($list->eventParams);
 
@@ -144,7 +147,7 @@ function sendToGoogleCal($scheduleList,$service,$calendarId){
 function deleteEvents($startDate,$endDate,$service,$calendarId){
     //Specify minimum and maximum time to search for
     $timeMin = $startDate . 'T00:00:00+01:00';
-    $timeMax = $endDate . 'T23:59:59+01:00';
+    $timeMax = $endDate . 'T00:00:00+01:00';
     
     //Saves the timeMin and timeMax parameters in an array
     $optParams = array('timeMin' => $timeMin, 'timeMax'=>$timeMax);
@@ -180,7 +183,11 @@ function deleteEvents($startDate,$endDate,$service,$calendarId){
         }
         
     }
+    
+    
+
 }
+
 
 
 
