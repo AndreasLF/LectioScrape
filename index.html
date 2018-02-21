@@ -36,15 +36,15 @@
                 weekNumbers: true,
                 timeFormat: 'H(:mm)',
                 slotEventOverlap: false,
-                eventOverlap: false
+                eventOverlap: false,
+                eventClick: function(event, jsEvent, view) {
+                    $('#eventModalTitle').html(event.title);
+                    $('#eventModalBody').html(event.description);
+                    $('#fullCalendarModal').modal();
+                }
             })
 
         });
-        
-        
-        
-        
-
     </script>
 
 
@@ -70,6 +70,42 @@
 <br>
 <div class="container">
 
+    
+<div class="container">
+  <div class="row">
+    <div class="col-6 text-center">
+      <button class="btn btn-primary">Backup i database</button>
+    </div>
+    <div class="col-6 text-center">
+      <button class="btn btn-primary">Sync with Google</button>
+    </div>
+  </div>
+</div>
+    
+    
+<div id="fullCalendarModal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="eventModalTitle" class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="eventModalBody" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Lectio</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Luk</button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+    
+    
+<br>
+    
 <body>
     <div id='calendar'></div>
 </body>
