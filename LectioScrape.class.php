@@ -6,7 +6,7 @@ $lectioSchedule = new LectioScrape('T23:59:59+01:00');
 echo "Week: ".$lectioSchedule->weekNumber."<br>";
 echo "Year: ".$lectioSchedule->year."<br>";
 
-var_dump($lectioSchedule->scheduleGoogle);
+var_dump($lectioSchedule->scheduleFullcalendar);
 
 
 
@@ -32,7 +32,7 @@ class LectioScrape{
     public $scheduleGoogle;
     
     
-    public $scheduleJson;
+    public $scheduleFullcalendar;
         
     
     /**
@@ -41,13 +41,13 @@ class LectioScrape{
     * @param string $date is a date inside the week you want to scrape. The date is in ISO8601 format
     */
     function __construct($date){
-        //includes simple_html_dom library
+        //Includes simple_html_dom library
         require_once __DIR__.'/simple_html_dom.php';
     
-        //includes other classes
+        //Includes classes
         require_once __DIR__.'/Lesson.class.php';
-        require_once __DIR__.'/ScheduleList.class.php';
         require_once __DIR__.'/LessonGoogleCalEvent.class.php';
+        require_once __DIR__.'/LessonFullcalendar.class.php';
 
         $this->weekNumber = $this->getWeekNumberFromDate($date)['weekNumber'];
         $this->year = $this->getWeekNumberFromDate($date)['year'];
@@ -56,6 +56,7 @@ class LectioScrape{
         
         $this->scheduleMySql = $schedule['schedule'];
         $this->scheduleGoogle = $schedule['scheduleGoogle'];
+        $this->scheduleFullcalendar = $schedule['scheduleFullcalendar'];
     }
     
 
@@ -81,6 +82,7 @@ class LectioScrape{
 
         $schedule;
         $scheduleGoogle;
+        $scheduleFullcalendar;
 
         foreach($html->find('.s2skemabrik') as $element){
             $data = $element->getAttribute('data-additionalinfo');
@@ -90,13 +92,15 @@ class LectioScrape{
 
                 $lesson = new Lesson($data);
                 $lessonGoogle = new LessonGoogleCalEvent($lesson);
+                $lessonFullcalendar = new LessonFullcalendar($lesson);
 
                 $schedule[] = $lesson;
                 $scheduleGoogle[] = $lessonGoogle;
+                $scheduleFullcalendar[] = $lessonFullcalendar;
             }
         }
 
-        return array('schedule' => $schedule,'scheduleGoogle' => $scheduleGoogle);    
+        return array('schedule' => $schedule,'scheduleGoogle' => $scheduleGoogle, 'scheduleFullcalendar' => $scheduleFullcalendar);    
     }
 
     
