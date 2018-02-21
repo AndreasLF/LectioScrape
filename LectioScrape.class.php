@@ -1,15 +1,5 @@
 <?php
 
- 
-$lectioSchedule = new LectioScrape('T23:59:59+01:00');
-
-echo "Week: ".$lectioSchedule->weekNumber."<br>";
-echo "Year: ".$lectioSchedule->year."<br>";
-
-var_dump($lectioSchedule->scheduleFullcalendar);
-
-
-
 /**
 * LectioScrape
 *
@@ -31,7 +21,7 @@ class LectioScrape{
     /** @var list containing lessonGoogleCalEvent objects */
     public $scheduleGoogle;
     
-    
+    /** @var list containing lessonFullcalendar objects */
     public $scheduleFullcalendar;
         
     

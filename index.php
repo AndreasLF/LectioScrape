@@ -25,7 +25,7 @@ $calendarId;
 //$weekArr = getWeekStartAndEndDate(2018,10);
 //echo $weekArr['weekStart'] . "<br>" . $weekArr['weekEnd'];
 
-echo getWeekNumberFromDate('2018-02-19T00:00:00');
+var_dump(getWeekNumberFromDate('2018-02-19T00:00:00'));
 
 //Checks if the user's access token is stored in the session
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
@@ -183,50 +183,6 @@ function deleteEvents($startDate,$endDate,$service,$calendarId){
 }
 
 
-/**
-* Gets the start and end date by specifying year and week number
-*
-* @param int $year is the year
-* @param int $weekNumber is the weeknumber
-* 
-* @return array containing weekStart and weekEnd 
-*/
-
-function getWeekStartAndEndDate($year,$weekNumber){
-    
-    //Creates a new dateTime object
-    $dateTimeObject = new DateTime();
-    
-    //Sets the date by using the ISO 8601 standard, specifying year and week number
-    $dateTimeObject->setISODate($year,$weekNumber);
-    
-    //Saves start date in an array
-    $dateRangeArray['weekStart'] = $dateTimeObject->format('Y-m-d');
-    
-    //Add 6 days to the dateTime object
-    $dateTimeObject->modify('+6 days');
-    
-    //Saves the new date in an array as the end date
-     $dateRangeArray['weekEnd'] = $dateTimeObject->format('Y-m-d');
-    
-    return $dateRangeArray;
-}
-
-
-
-/**
-* Gets the week number by specifying a date in the week
-*
-* @param string $date is the date
-*
-* @return string week number
-*/
-function getWeekNumberFromDate($date){
-    
-    $dateTimeObject = new DateTime($date);
-    $weekNumber = $dateTimeObject->format("W");
-    return $weekNumber; 
-}
 
 
 
