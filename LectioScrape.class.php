@@ -6,7 +6,7 @@ $lectioSchedule = new LectioScrape('T23:59:59+01:00');
 echo "Week: ".$lectioSchedule->weekNumber."<br>";
 echo "Year: ".$lectioSchedule->year."<br>";
 
-var_dump($lectioSchedule->scheduleMySql);
+var_dump($lectioSchedule->scheduleGoogle);
 
 
 
@@ -25,10 +25,10 @@ class LectioScrape{
     /** @var string $year*/
     public $year;
     
-    /** @var object scheduleList containing lesson objects */
+    /** @var list containing lesson objects */
     public $scheduleMySql; 
     
-    /** @var object scheduleList containing lessonGoogleCalEvent objects */
+    /** @var list containing lessonGoogleCalEvent objects */
     public $scheduleGoogle;
     
     
@@ -79,8 +79,8 @@ class LectioScrape{
         //creates html-DOM from the URL
         $html = file_get_html($lectioURL);
 
-        $schedule = new ScheduleList(10);
-        $scheduleGoogle = new ScheduleList(10);
+        $schedule;
+        $scheduleGoogle;
 
         foreach($html->find('.s2skemabrik') as $element){
             $data = $element->getAttribute('data-additionalinfo');
@@ -91,8 +91,8 @@ class LectioScrape{
                 $lesson = new Lesson($data);
                 $lessonGoogle = new LessonGoogleCalEvent($lesson);
 
-                $schedule->addLesson($lesson);
-                $scheduleGoogle->addLesson($lessonGoogle);
+                $schedule[] = $lesson;
+                $scheduleGoogle[] = $lessonGoogle;
             }
         }
 
