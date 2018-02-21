@@ -148,47 +148,41 @@ class LectioScrape{
 
     
     
+    /**
+    * Sends the schedule to the MySQL database
+    * @param $scheduleList is list of lessons to upload.
+    */
+    public function sendToDatabase(){
+        //Includes connection.php - connects to database
+        require_once __DIR__.'/connection.php';
+
+        foreach($this->scheduleMySql as $lesson){
+            $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
+
+            $stmt->bind_param("sssssssssss",$weekNumber,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); //Binds parameters to the prepared statement. Every parameter is of type String
+
+            $result = $stmt->execute(); //Executes the prepared statement. Returns a boolean - true on succes and false on failure.
+
+
+            if ($result){ //If $result is true (mysqli_query was successful)
+                echo "Data uploaded successfully<br><br>";
+
+            }
+            else{ //If $result is false (mysqli_query was unsuccesful)
+                echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
+            }
+
+
+            $stmt->close(); //Closes the prepared statement 
+        }   
+    }
+
+    
+    
     
 }
 
 
-
-
-
-
-
-
-
-
-
-/**
-* Sends the schedule to the MySQL database
-* @param $scheduleList is list of lessons to upload.
-*/
-function sendScheduleToDatabase($scheduleList){
-    //Includes connection.php - connects to database
-    require_once __DIR__.'/connection.php';
-
-    foreach($scheduleList as $lesson){
-        $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");//Creates a prepared statement for the database
-        
-        $stmt->bind_param("sssssssssss",$weekNumber,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); //Binds parameters to the prepared statement. Every parameter is of type String
-        
-        $result = $stmt->execute(); //Executes the prepared statement. Returns a boolean - true on succes and false on failure.
-      
-        
-        if ($result){ //If $result is true (mysqli_query was successful)
-            echo "Data uploaded successfully<br><br>";
-            
-        }
-        else{ //If $result is false (mysqli_query was unsuccesful)
-            echo "<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br><br>"; //An error message is created and echoed to screen
-        }
-        
-        
-        $stmt->close(); //Closes the prepared statement 
-    }   
-}
 
 
 
