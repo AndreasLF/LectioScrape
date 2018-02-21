@@ -15,38 +15,7 @@
     <script src='fullcalendar/fullcalendar.js'></script>
 
 
-    <script>
-        $(document).ready(function() {
-
-            // page is now ready, initialize the calendar...
-
-            $('#calendar').fullCalendar({
-                events: 'fullcalendarFeed.php',
-                editable: false,
-                header: {
-                    left: 'prev',
-                    center: '',
-                    right: 'next'
-                },
-                defaultView: 'agendaWeek',
-                minTime: '07:00:00',
-                maxTime: '19:00:00',
-                themeSystem: 'standard',
-                displayEventTime: true,
-                weekNumbers: true,
-                timeFormat: 'H(:mm)',
-                slotEventOverlap: false,
-                eventOverlap: false,
-                eventClick: function(event, jsEvent, view) {
-                    $('#eventModalTitle').html(event.title);
-                    $('#eventModalBody').html(event.description);
-                    $('#fullCalendarModal').modal();
-                },
-                firstDay: 1
-            })
-
-        });
-    </script>
+    <script src="script.js"></script>
 
 
 </head>
@@ -72,13 +41,14 @@
 <div class="container">
 
     
+    
 <div class="container">
   <div class="row">
     <div class="col-6 text-center">
-      <button class="btn btn-primary">Backup i database</button>
+      <button type="button" class="btn btn-primary">Backup i database</button>
     </div>
     <div class="col-6 text-center">
-      <button class="btn btn-primary">Sync with Google</button>
+      <button type="button" class="btn btn-primary" id="googleButton">Sync with Google</button>
     </div>
   </div>
 </div>
