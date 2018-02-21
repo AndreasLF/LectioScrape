@@ -22,6 +22,7 @@
 
             $('#calendar').fullCalendar({
                 events: 'fullcalendarFeed.php',
+                editable: false,
                 header: {
                     left: 'prev',
                     center: '',
@@ -31,7 +32,11 @@
                 minTime: '07:00:00',
                 maxTime: '19:00:00',
                 themeSystem: 'standard',
-                displayEventTime: true
+                displayEventTime: true,
+                weekNumbers: true,
+                timeFormat: 'H(:mm)',
+                slotEventOverlap: false,
+                eventOverlap: false
             })
 
         });
