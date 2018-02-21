@@ -3,8 +3,8 @@ require_once __DIR__.'/LectioScrape.class.php';
 
 $eventList = array();
 
-$end = $_GET['end'];
-$lectioSchedule = new LectioScrape($end);
+$start = $_GET['start'];
+$lectioSchedule = new LectioScrape($start);
 
 $eventArray;
 
