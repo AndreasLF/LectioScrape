@@ -90,11 +90,33 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     
     
     
-   
+    $client->setUseBatch(true);
+    $batch = new Google_Http_Batch($client);
+
+    
+
+    $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
+    
+     foreach($schedule->scheduleGoogle as $list) {
+        //Creates new event
+        $event = new Google_Service_Calendar_Event($list->eventParams);
+
+
+        //Inserts the event to the calendar
+        $event = $service->events->insert($calendarId, $event);
+         
+        if($event){
+            $batch->add($event);
+        }
+    }
+    
+    $results = $batch->execute();
+    
+    /*
     deleteEvents($_SESSION['startDate'],$_SESSION['endDate'],$service,$calendarId);
     $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
     sendToGoogleCal($schedule->scheduleGoogle,$service,$calendarId);
-    
+    */
     
     
     //deleteWeek($service,$calendarId);
