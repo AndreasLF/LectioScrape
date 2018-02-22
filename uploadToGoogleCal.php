@@ -86,45 +86,6 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     }
     
     
-    
-    
-    
-    
-    $client->setUseBatch(true);
-    $batch = new Google_Http_Batch($client);
-
-    
-
-    $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
-    
-     foreach($schedule->scheduleGoogle as $list) {
-        //Creates new event
-        $event = new Google_Service_Calendar_Event($list->eventParams);
-
-
-        //Inserts the event to the calendar
-        $event = $service->events->insert($calendarId, $event);
-         
-        if($event){
-            $batch->add($event);
-        }
-    }
-    
-    $results = $batch->execute();
-    
-    /*
-    deleteEvents($_SESSION['startDate'],$_SESSION['endDate'],$service,$calendarId);
-    $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
-    sendToGoogleCal($schedule->scheduleGoogle,$service,$calendarId);
-    */
-    
-    
-    //deleteWeek($service,$calendarId);
-    //scrapeLectio('102018');
-    //sendToGoogleCal($_SESSION['scheduleGoogle'],$service,$calendarId);
-    //var_dump($_SESSION['scheduleGoogle']->scheduleList);
-    
-    
 } 
 else {
     //If no auth token is stored in the SESSION variable, the browser gets redirected to oauth2callback.php
@@ -133,28 +94,38 @@ else {
 }
 
 
+deleteEvents($_SESSION['startDate'],$_SESSION['endDate'],$client,$service,$calendarId);
+$schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
+sendToGoogleCal($schedule->scheduleGoogle,$client,$service,$calendarId);
+
 
 
 /**
 * Sends the schedule to Google calendar
 * 
 * @param $scheduleList is a list of objects created from the LessonGoogleCalEvent class
+* @param $client Google_Client object
 * @param $service Google_Service_Calendar object
 * @param $calendarId Google calendarId
 */
-function sendToGoogleCal($scheduleList,$service,$calendarId){
+function sendToGoogleCal($scheduleList,$client,$service,$calendarId){
+    //Batch setup
+    $client->setUseBatch(true);
+    $batch = new Google_Http_Batch($client);
+    
     foreach($scheduleList as $list) {
         //Creates new event
         $event = new Google_Service_Calendar_Event($list->eventParams);
-
-
+        
         //Inserts the event to the calendar
         $event = $service->events->insert($calendarId, $event);
-
-        if($event){
-            echo 'event created successfully<br>';
-        }
+        
+        //Adds to the batch
+        $batch->add($event);
     }
+    
+    //Executes batch
+    $batch->execute();
 }
 
 
@@ -163,50 +134,74 @@ function sendToGoogleCal($scheduleList,$service,$calendarId){
 *
 * @param string $startDate is the start date in the following format: 'YYYY-MM-DD'
 * @param string $endDate is the end date in the following format: 'YYYY-MM-DD'
+* @param $client Google_Client object
 * @param $service Google_Service_Calendar object
 * @param $calendarId Google calendarId
 */
-function deleteEvents($startDate,$endDate,$service,$calendarId){
+function deleteEvents($startDate,$endDate,$client,$service,$calendarId){
+    
     //Specify minimum and maximum time to search for
     $timeMin = $startDate . 'T00:00:00+01:00';
     $timeMax = $endDate . 'T00:00:00+01:00';
+    
+    //List of items
+    $eventItemsList;
+    
     
     //Saves the timeMin and timeMax parameters in an array
     $optParams = array('timeMin' => $timeMin, 'timeMax'=>$timeMax);
     
     //creates the events list
     $events = $service->events->listEvents($calendarId,$optParams);
+
+    //Add items to the list
+    $eventItemsList[] = $events->getItems();
     
-    //Deletes every event in the events list
+    //If more calendarList pages exist they will be added to the eventsItemsList array
     //Loops until a break occurs
-    while(true) {
-        foreach ($events->getItems() as $event) {
-            //Gets the event id
-            $eventId = $event->getId();
-            //Deletes the event
-            $service->events->delete($calendarId, $eventId);
-        }
-        
+    while(true){
         //Gets the next page token
         $pageToken = $events->getNextPageToken();
         
-        //If more calendarList pages exist ($pageToken == true)
         if ($pageToken) {
             
             //The page token is added to the optParams
             $optParams = array('pageToken' => $pageToken,'timeMin' => $timeMin, 'timeMax'=>$timeMax);
-            
+
             //A new list of events is created
             $events = $service->events->listEvents($calendarId, $optParams);
+            
+            //Add items to the list
+            $eventItemsList[] = $events->getItems();
+            
         } 
         else {
             //Break free from while loop if no more pages exist 
             break;
         }
-        
     }
     
+    //Batch setup
+    $client->setUseBatch(true);
+    $batch = new Google_Http_Batch($client);
     
+        
+    //Deletes every event in the events list
+   
+   foreach($eventItemsList as $eventItems){
+        foreach ($eventItems as $event) {
+            //Gets the event id
+            $eventId = $event->getId();
+            //Deletes the event
+            $eventDeletion = $service->events->delete($calendarId, $eventId);
+            
+            //Add event deletion to the batch
+            $batch->add($eventDeletion);
+        }
+   }
+    
+    //Batch execution    
+    $batch->execute();
 
 }
 
