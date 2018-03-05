@@ -13,7 +13,7 @@ $(document).ready(function() {
                 defaultView: 'agendaWeek',
                 minTime: '07:00:00',
                 maxTime: '19:00:00',
-                themeSystem: 'standard',
+                themeSystem: 'bootstrap4',
                 displayEventTime: true,
                 weekNumbers: true,
                 timeFormat: 'H(:mm)',
