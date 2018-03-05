@@ -6,6 +6,8 @@
 * @author Andreas Fiehn
 */
 class Lesson{
+    public $lessonURL;
+    
     public $status;
     public $description;
     public $date;
@@ -22,9 +24,13 @@ class Lesson{
     /** 
     * This method constructs the object from the lesson class
     * @param String $data contains the lesson data as a string. The lesson data is fetched from Lectio and is the content of the data-additionalinfo class.
+    * @param String $url is the lessons web page url
     */
-    function __construct($data){
+    function __construct($data,$url){
         
+     
+        $this->lessonURL = $url;
+            
         //Sets every property by refering to functions
         $this->setStatusAndDescription($data);
         $this->setDate($data);

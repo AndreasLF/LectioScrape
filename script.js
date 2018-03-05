@@ -22,6 +22,7 @@ $(document).ready(function() {
                 eventClick: function(event, jsEvent, view) {
                     $('#eventModalTitle').html(event.title);
                     $('#eventModalBody').html(event.description);
+                    $('#eventModalLectioButtonLink').prop("href",event.lessonURL);
                     $('#fullCalendarModal').modal();
                 },
                 firstDay: 1

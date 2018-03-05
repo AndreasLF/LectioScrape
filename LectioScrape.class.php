@@ -3,7 +3,7 @@
 
 $schedule = new LectioScrape("2018-02-24T07:55:06");
 
-var_dump($schedule->scheduleMySql);
+//var_dump($schedule->scheduleMySql);
 
 
 /**
@@ -82,11 +82,19 @@ class LectioScrape{
 
         foreach($html->find('.s2skemabrik') as $element){
             $data = $element->getAttribute('data-additionalinfo');
+            
+            if($href = $element->href){
+                $url = "https://www.lectio.dk" . $element->href;
+            }
+            else{
+                $url = $lectioURL;
+            }
+            
 
             //Peforms af regular expression to check if the class has a date. If not it wont be processed
             if(!(preg_match('/(\d\d|\d)\/(\d\d|\d)-(\d\d\d\d)/', $data, $dateArr)==0)){
 
-                $lesson = new Lesson($data);
+                $lesson = new Lesson($data,$url);
                 $lessonGoogle = new LessonGoogleCalEvent($lesson);
                 $lessonFullcalendar = new LessonFullcalendar($lesson);
 

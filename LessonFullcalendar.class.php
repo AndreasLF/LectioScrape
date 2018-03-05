@@ -25,7 +25,8 @@ class LessonFullcalendar{
         'color'=>'#429ef4',
         'textColor'=>'#000000',
         'start'=>$this->setStartEvent($lessonObject)['start'],
-        'end'=>$this->setEndEvent($lessonObject)['end']
+        'end'=>$this->setEndEvent($lessonObject)['end'],
+        'lessonURL'=>$this->setURL($lessonObject)
         );
     }
     
@@ -132,6 +133,10 @@ class LessonFullcalendar{
                 'allDay' => true
                 );
         } 
+    }
+    
+    private function setURL($lessonObject){
+        return $lessonObject->lessonURL;
     }
     
     
