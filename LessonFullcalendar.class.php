@@ -36,15 +36,29 @@ class LessonFullcalendar{
     * @return string
     */
     private function setTitle($lessonObject){
-        if($lessonObject->description){
-            if($lessonObject->class){             
-                return $lessonObject->description . "\n(".$lessonObject->class.")";
+        if($lessonObject->description && $lessonObject->class){
+            if($lessonObject->status){
+                return $lessonObject->status. "!\n". $lessonObject->description . "\n(".$lessonObject->class.")";
             }
-            return $lessonObject->description;
-            
+            else{
+                 return $lessonObject->description . "\n(".$lessonObject->class.")";
+            }
+        }
+        else if($lessonObject->class){
+            if($lessonObject->status){
+                return $lessonObject->status. "!\n". $lessonObject->class;
+            }
+            else{
+                return $lessonObject->class;
+            }
         }
         else{
-            return $lessonObject->class;
+            if($lessonObject->status){
+                return $lessonObject->status. "!\n". $lessonObject->description;
+            }
+            else{
+                return $lessonObject->description;
+            }
         }
        
         
