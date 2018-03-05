@@ -98,6 +98,14 @@ deleteEvents($_SESSION['startDate'],$_SESSION['endDate'],$client,$service,$calen
 $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
 sendToGoogleCal($schedule->scheduleGoogle,$client,$service,$calendarId);
 
+$redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/index.html';
+header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+
+
+
+
+
+
 
 
 /**

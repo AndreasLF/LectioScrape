@@ -1,5 +1,11 @@
 <?php
 
+
+$schedule = new LectioScrape("2018-02-24T07:55:06");
+
+var_dump($schedule->scheduleMySql);
+
+
 /**
 * LectioScrape
 *

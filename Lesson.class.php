@@ -15,6 +15,7 @@ class Lesson{
     public $teacher;
     public $room;
     public $homework;
+    public $additionalContent;
     public $note;
     
     
@@ -32,6 +33,7 @@ class Lesson{
         $this->setTeacher($data);
         $this->setRoom($data);
         $this->setHomework($data);
+        $this->setAdditionalContent($data);
         $this->setNote($data);
     }
     
@@ -195,19 +197,47 @@ class Lesson{
         }
     }
     
+    
+   
+    
         
     /**
     * Saves the homework on the lesson
     * @param String $data contains the lesson data as a string. The lesson data is fetched from Lectio and is the content of the data-additionalinfo class.
     */
     private function setHomework($data) {
-        if(preg_match('/Lektier:\s-\s(.*)/', $data, $matches)){
+        if(preg_match('/Lektier:\s(.*)/', $data, $matches)){
             $this->homework = $matches[1];
+            
+            if(preg_match('/Lektier:\s(.*)\sØvrigt\sindhold:/', $data, $matches)){
+                $this->homework = $matches[1];
+            }
+            else if(preg_match('/Lektier:\s(.*)\sNote/', $data, $matches)){
+                $this->homework = $matches[1];
+            }
         }
         else {
             $this->homework = NULL;
         }
     }
+    
+    
+    
+     
+    private function setAdditionalContent($data){
+        if(preg_match('/Øvrigt\sindhold:\s(.*)/', $data, $matches)){
+            $this->additionalContent = $matches[1];
+            
+            if(preg_match('/Øvrigt\sindhold:\s(.*)\sNote:/', $data, $matches)){
+                $this->additionalContent = $matches[1];
+            }
+            
+        }
+        else {
+            $this->additionalContent = NULL;
+        }
+    }
+    
     
     /**
     * Saves the notes on the lesson
