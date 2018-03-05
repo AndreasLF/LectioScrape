@@ -19,6 +19,7 @@ class Lesson{
     public $homework;
     public $additionalContent;
     public $note;
+    public $students;
     
     
     /** 
@@ -41,6 +42,7 @@ class Lesson{
         $this->setHomework($data);
         $this->setAdditionalContent($data);
         $this->setNote($data);
+        $this->setStudents($data);
     }
     
     
@@ -55,7 +57,7 @@ class Lesson{
             $this->status = 'Ændret';
             
             //If there is a string between "Ændret!" and the date. Here the class descritption will show up if there is any
-            if(preg_match('/^Ændret!\s(.*)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
+            if(preg_match('/^Ændret!\s(.*?)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
                 
                 $this->description = $matches[1];
              }
@@ -66,13 +68,13 @@ class Lesson{
             $this->status = 'Aflyst';
             
             //If there is a string between "Aflyst!" and the date. Here the class descritption will show up if there is any.
-            if(preg_match('/^Aflyst!\s(.*)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
+            if(preg_match('/^Aflyst!\s(.*?)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
             
                 $this->description = $matches[1];
             }
         }
         //Else if there is a string before the date. Here the class description will show up if there is any.
-        else if(preg_match('/(.*)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
+        else if(preg_match('/(.*?)\s((\d\d|\d)\/(\d\d|\d)-(\d\d\d\d))/', $data, $matches)){
             
             $this->status = NULL;
             $this->description = $matches[1];
@@ -148,12 +150,64 @@ class Lesson{
     private function setClass($data){
         //Searches for the content between 'Hold: ' and ' Lærer'. The '?' makes it non-greedy, which means it will search for the shortest string between the two.
         if(preg_match('/Hold:\s(.*?)\sLærer/', $data, $matches)){
-            $this->class = $matches[1];
+            $this->class = $this->convertClass($matches[1]);
         }
         else{
             $this->class = NULL;
         }
     }
+    
+    
+    /**
+    * Converts the classId to a class name
+    * @param String $classId is the class id
+    */
+    private function convertClass($classId){
+        if(preg_match('/DA/', $classId)){
+            return "Dansk";
+        } 
+        else if(preg_match('/MA|Ma/', $classId)){
+            return "Matematik";
+        }
+        else if(preg_match('/FY|Fy/', $classId)){
+            return "Fysik";
+        } 
+        else if(preg_match('/TK/', $classId)){
+            return "Teknik";
+        } 
+        else if(preg_match('/EN|En/', $classId)){
+            return "Engelsk";
+        } 
+        else if(preg_match('/KE|Ke/', $classId)){
+            return "Kemi";
+        } 
+        else if(preg_match('/Itk/', $classId)){
+            return "Informationsteknologi";
+        } 
+        else if(preg_match('/pro/', $classId)){
+            return "Programmering";
+        } 
+        else if(preg_match('/Ti/', $classId)){
+            return "Teknologi";
+        } 
+        else if(preg_match('/th/', $classId)){
+            return "Teknologihistorie";
+        } 
+        else if(preg_match('/Sa/', $classId)){
+            return "Samfundsfag";
+        } 
+        else if(preg_match('/SO|SOf/', $classId)){
+            return "Studieområde";
+        } 
+        else if(preg_match('/Andenaktiv/', $classId)){
+            return "Anden aktivitet";
+        } 
+        else{
+            return $classId;
+        }
+        
+    }
+    
     
     /**
     * Saves the teacher on the lesson
@@ -229,7 +283,10 @@ class Lesson{
     
     
     
-     
+    /**
+    * Saves the additional content for the lesson
+    * @param String $data contains the lesson data as a string. The lesson data is fetched from Lectio and is the content of the data-additionalinfo class.
+    */  
     private function setAdditionalContent($data){
         if(preg_match('/Øvrigt\sindhold:\s(.*)/', $data, $matches)){
             $this->additionalContent = $matches[1];
@@ -252,10 +309,26 @@ class Lesson{
     private function setNote($data){
         if(preg_match('/Note:\s(.*)/', $data, $matches)){
             $this->note = $matches[1]; 
+            if(preg_match('/Øvrigt\sindhold:\s(.*)\sElever:/', $data, $matches)){
+                $this->additionalContent = $matches[1];
+            }
         }
         else{
             $this->note = NULL;
         }
-    }  
+    }
+    
+    /**
+    * Saves the students on the lesson
+    * @param String $data contains the lesson data as a string. The lesson data is fetched from Lectio and is the content of the data-additionalinfo class.
+    */  
+    private function setStudents($data){
+        if(preg_match('/Elever:\s(.*)/', $data, $matches)){
+            $this->students = $matches[1]; 
+        }
+        else{
+            $this->students = NULL;
+        }
+    }
 }
 ?>

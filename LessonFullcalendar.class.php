@@ -37,11 +37,15 @@ class LessonFullcalendar{
     * @return string
     */
     private function setTitle($lessonObject){
-        if($lessonObject->class){
-            return $lessonObject->class;     
+        if($lessonObject->description){
+            if($lessonObject->class){             
+                return $lessonObject->description . "\n(".$lessonObject->class.")";
+            }
+            return $lessonObject->description;
+            
         }
         else{
-            return $lessonObject->description;
+            return $lessonObject->class;
         }
        
         
@@ -66,19 +70,27 @@ class LessonFullcalendar{
         }
         
         if($lessonObject->teacher){
-            $descriptionArray[] = "Lærer: " . $lessonObject->teacher;
+            $descriptionArray[] = "<b>Lærer: </b>" . $lessonObject->teacher;
         }
         
         if($lessonObject->room){
-            $descriptionArray[] = "Lokale: " . $lessonObject->room;
+            $descriptionArray[] = "<b>Lokale: </b>" . $lessonObject->room;
         }
         
         if($lessonObject->homework){
-            $descriptionArray[] = "Lektier: " . $lessonObject->homework;
+            $descriptionArray[] = "<b>Lektier: </b>" . $lessonObject->homework;
+        }
+        
+         if($lessonObject->additionalContent){
+            $descriptionArray[] = "<b>Øvrigt indhold: </b>" . $lessonObject->additionalContent;
         }
         
         if($lessonObject->note){
-            $descriptionArray[] = "Note: " . $lessonObject->note;
+            $descriptionArray[] = "<b>Note: </b>" . $lessonObject->note;
+        }
+        
+        if($lessonObject->students){
+            $descriptionArray[] = "<b>Elever: </b>" . $lessonObject->students;
         }
         
         
