@@ -6,7 +6,7 @@ $eventList = array();
 $start = $_GET['start'];
 $lectioSchedule = new LectioScrape($start);
 
-$eventArray;
+$eventArray = array();
 
 
 foreach($lectioSchedule->scheduleFullcalendar as $event){
