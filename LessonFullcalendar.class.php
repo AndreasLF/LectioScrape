@@ -9,39 +9,86 @@
 */
 class LessonFullcalendar{
     
-    public $calendarEvent;
+    /** @var array containing calendar event in Fullcalendar format*/
+    private $calendarEvent;
+    
+    /** @var string */
+    private $title;
+
+    /** @var string */
+    private $description;
+    
+    /** @var array */
+    private $startEvent;
+    
+    /** @var array */
+    private $endEvent;
+    
+    /** @var string */
+    private $url;
+    
+    /** @var string */
+    private $color;
     
     
     /**
     * Constructs the Event object ready for Fullcalendar
-    * @param $lessonObject is the object from which the calendar event is created from
+    * @param $lessonObject is the object from which the calendar event is created
     */
     function __construct($lessonObject){
+        //Sets the calendar parameters
+        $this->setTitle($lessonObject);
+        $this->setStartEvent($lessonObject);
+        $this->setDescription($lessonObject);
+        $this->setEventColor($lessonObject);
+        $this->setStartEvent($lessonObject);
+        $this->setEndEvent($lessonObject);
+        $this->setURL($lessonObject);
+        
+        //Creates the calendar event
+        $this->setCalendarEvent();
+    }
+    
+    
+    /**
+    * This gets the fullcalendar event
+    *
+    * @return array 
+    */
+    public function getCalendarEvent(){
+        return $this->calendarEvent;
+    }
+    
+    
+    /**
+    * This sets the calendarEvent property
+    *
+    */
+    private function setCalendarEvent(){
         $this->calendarEvent = array(
-        'title'=>$this->setTitle($lessonObject),
-        'allday'=>$this->setStartEvent($lessonObject)['allDay'],
-        'description'=>$this->setDescription($lessonObject),
-        'color'=>$this->getEventColor($lessonObject),
-        'textColor'=>'#ffffff',
-        'start'=>$this->setStartEvent($lessonObject)['start'],
-        'end'=>$this->setEndEvent($lessonObject)['end'],
-        'lessonURL'=>$this->setURL($lessonObject),
+            'title'=>$this->title,
+            'allday'=>$this->startEvent['allDay'],
+            'description'=>$this->description,
+            'color'=>$this->color,
+            'textColor'=>'#ffffff',
+            'start'=>$this->startEvent['start'],
+            'end'=>$this->endEvent['end'],
+            'lessonURL'=>$this->url
         );
     }
     
     
     /**
-    * Returns the lesson's summary
+    * Sets the lesson's summary
     * @param $lessonObject is the lesson object created from the Lesson class
-    * @return string
     */
     private function setTitle($lessonObject){
         if($lessonObject->description && $lessonObject->class){
             if($lessonObject->status){
-                return $lessonObject->status. "!\n". $lessonObject->description . "\n(".$lessonObject->class.")";
+                $this->title = $lessonObject->status. "!\n". $lessonObject->description . "\n(".$lessonObject->class.")";
             }
             else{
-                 return $lessonObject->description . "\n(".$lessonObject->class.")";
+                 $this->title = $lessonObject->description . "\n(".$lessonObject->class.")";
             }
         }
         else if($lessonObject->class){
@@ -49,15 +96,15 @@ class LessonFullcalendar{
                 return $lessonObject->status. "!\n". $lessonObject->class;
             }
             else{
-                return $lessonObject->class;
+                $this->title = $lessonObject->class;
             }
         }
         else{
             if($lessonObject->status){
-                return $lessonObject->status. "!\n". $lessonObject->description;
+                $this->title = $lessonObject->status. "!\n". $lessonObject->description;
             }
             else{
-                return $lessonObject->description;
+                $this->title = $lessonObject->description;
             }
         }
        
@@ -65,9 +112,8 @@ class LessonFullcalendar{
     }
     
     /**
-    * Returns the lesson description
+    * Set the lesson description
     * @param $lessonObject is the lesson object created from the Lesson class
-    * @return string
     */
     private function setDescription($lessonObject){
         
@@ -114,24 +160,23 @@ class LessonFullcalendar{
             
         }
         
-        return $descriptionString;
+        $this->description = $descriptionString;
     }
     
     /**
-    * Returns the start time and timezone of the lesson 
+    * Set the start time and timezone of the lesson 
     * @param $lessonObject is the lesson object created from the Lesson class
-    * @return string
     */
     private function setStartEvent($lessonObject){
         
         if($lessonObject->startTime){
-            return array(
+            $this->startEvent = array(
                 'start' => $lessonObject->date.'T'.$lessonObject->startTime,
                 'allDay' => false
                 );
         }
         else {
-            return array(
+            $this->startEvent = array(
                 'start' => $lessonObject->date,
                 'allDay' => true
                 );
@@ -139,21 +184,20 @@ class LessonFullcalendar{
             
     }
     
-     /**
-    *  Returns the start time and timezone of the lesson 
+    /**
+    * Sets the start time and timezone of the lesson 
     * @param $lessonObject is the lesson object created from the Lesson class
-    * @return string
     */
     private function setEndEvent($lessonObject){
         
          if($lessonObject->endTime){
-            return array(
+            $this->endEvent = array(
                 'end' => $lessonObject->date.'T'.$lessonObject->endTime,
                 'allDay' => false
                 );
         }
         else {
-            return array(
+            $this->endEvent = array(
                 'end' => $lessonObject->date,
                 'allDay' => true
                 );
@@ -162,20 +206,18 @@ class LessonFullcalendar{
     
     
     /**
-    * Returns the lesson URL
+    * Sets the lesson URL
     * @param $lessonObject is the lesson object created from the Lesson class
-    * @return string
     */
     private function setURL($lessonObject){
-        return $lessonObject->lessonURL;
+        $this->url = $lessonObject->lessonURL;
     }
     
     /**
-    * Returns the event color
+    * Sets the event color
     * @param $lessonObject is the lesson object created from the Lesson class
-    * @return string
     */
-    private function getEventColor($lessonObject){
+    private function setEventColor($lessonObject){
         $colorsArray = array(
             'red'=>'#d32f2f',
             'pink'=>'#c2185b',
@@ -200,53 +242,45 @@ class LessonFullcalendar{
         
         
          if($lessonObject->status == 'Ændret'){
-            return $colorsArray['green'];
+            $this->color = $colorsArray['green'];
         }
         else if($lessonObject->status == 'Aflyst'){
-            return $colorsArray['red'];
+            $this->color = $colorsArray['red'];
         }
         else{
 
             if($lessonObject->startTime == NULL && $lessonObject->endTime == NULL){
-                return $colorsArray['indigo'];
+                $this->color = $colorsArray['indigo'];
             }
             else if($lessonObject->class == "Matematik"){
-                return $colorsArray['blue'];
+                $this->color = $colorsArray['blue'];
             }
             else if($lessonObject->class == "Dansk"){
-                return $colorsArray['orange'];
+                $this->color = $colorsArray['orange'];
             }
             else if($lessonObject->class == "Fysik"){
-                return $colorsArray['teal'];
+                $this->color = $colorsArray['teal'];
             }
             else if($lessonObject->class == "Kemi"){
-                return $colorsArray['light green'];
+                $this->color = $colorsArray['light green'];
             }
             else if($lessonObject->class == "Samfundsfag"){
-                return $colorsArray['gray'];
+                $this->color = $colorsArray['gray'];
             }
             else if($lessonObject->class == "Informationsteknologi"){
-                return $colorsArray['purple'];
+                $this->color = $colorsArray['purple'];
             }
             else if($lessonObject->class == "Programmering"){
-                return $colorsArray['purple'];
+                $this->color = $colorsArray['purple'];
             }
             else if($lessonObject->class == "Teknik"){
-                return $colorsArray['pink'];
+                $this->color = $colorsArray['pink'];
             }
             else{
-                return $colorsArray['blue gray'];
+                $this->color = $colorsArray['blue gray'];
             }
         }
-        
-        
-        
-        return '#d32f2f';
     }
-    
-    
-    
-    
 }
 
 

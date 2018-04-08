@@ -1,7 +1,6 @@
 <?php
 
 
-
 /**
 * LectioScrape
 *
@@ -17,14 +16,18 @@ class LectioScrape{
     /** @var string $year*/
     public $year;
     
-    /** @var list containing lesson objects */
-    public $scheduleMySql; 
+    /** @var array containing lesson objects */
+    private $scheduleMySql; 
     
-    /** @var list containing lessonGoogleCalEvent objects */
+    /** @var array containing lessonGoogleCalEvent objects */
     public $scheduleGoogle;
     
-    /** @var list containing lessonFullcalendar objects */
+    /** @var array containing lessonFullcalendar objects */
     public $scheduleFullcalendar;
+    
+    /** @var mysqli object*/
+    private $mysqli;
+    
         
     
     /**
@@ -41,11 +44,14 @@ class LectioScrape{
         require_once __DIR__.'/LessonGoogleCalEvent.class.php';
         require_once __DIR__.'/LessonFullcalendar.class.php';
 
+        //Sets the weekNumber and year
         $this->weekNumber = $this->getWeekNumberFromDate($date)['weekNumber'];
         $this->year = $this->getWeekNumberFromDate($date)['year'];
         
+        //Scrapes the schedule
         $schedule = $this->scrapeLectio($date);
         
+        //Sets the schedule parameters
         $this->scheduleMySql = $schedule['schedule'];
         $this->scheduleGoogle = $schedule['scheduleGoogle'];
         $this->scheduleFullcalendar = $schedule['scheduleFullcalendar'];
@@ -55,14 +61,16 @@ class LectioScrape{
     /**
     * This function scrapes the schedule for one week on lectio.dk
     *
-    * @param string $weekNumber is the week you want to scrape
+    * @param string $date is a date inside the week you want to scrape. The date is in ISO8601 format
     *
-    * @return array containing the schedule for one week in two formats - schedule (MySQL-ready) and scheduleGoogle (Google Cal-ready) 
+    * @return array containing the schedule for one week in three formats - schedule (MySQL-ready), scheduleGoogle (Google Cal-ready), scheduleFullcalendar (Fullcalendar-ready)
     */
     private function scrapeLectio($date){
 
+        //gets the week number from the date and saves it in $date. $date is now an array containing weekNumber and year
         $date = $this->getWeekNumberFromDate($date);
 
+        //Sets the weekNumber and year class properties
         $this->weekNumber = $date['weekNumber'];
         $this->year = $date['year'];
         
@@ -82,6 +90,7 @@ class LectioScrape{
         foreach($html->find('.s2skemabrik') as $element){
             $data = $element->getAttribute('data-additionalinfo');
             
+            
             if($href = $element->href){
                 $url = "https://www.lectio.dk" . $element->href;
             }
@@ -98,8 +107,8 @@ class LectioScrape{
                 $lessonFullcalendar = new LessonFullcalendar($lesson);
 
                 $schedule[] = $lesson;
-                $scheduleGoogle[] = $lessonGoogle;
-                $scheduleFullcalendar[] = $lessonFullcalendar;
+                $scheduleGoogle[] = $lessonGoogle->getEventParams();
+                $scheduleFullcalendar[] = $lessonFullcalendar->getCalendarEvent();
             }
         }
 
@@ -157,63 +166,104 @@ class LectioScrape{
     
     /**
     * Sends the schedule to the MySQL database
+    *
+    * @return boolean true on succes, false on failure
     */
     public function sendToDatabase(){
-        //Includes connection.php - connects to database
-        require_once __DIR__.'/connection.php';
+        
+        //Checks if the mysqli property is set
+        if(!isset($this->mysqli)){
+            //Creates a new mysqli obect
+            $this->mysqli = new mysqli("localhost","LectioDB","password","lectio"); 
+        }
         
         //Creates the weekID
         $weekID = $this->weekNumber.$this->year;
         
         //Deletes the week to prevent duplicates
-        $this->deleteFromDatabase($connection,$weekID);
+        $r = $this->deleteFromDatabase($weekID);
+        
+        //If the week was not deleted from the database. False is returned
+        if(!($r)){
+            return false;
+        }
         
         foreach($this->scheduleMySql as $lesson){ 
             
             //Creates a prepared statement for the database
-            $stmt = mysqli_prepare($connection,"INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");
+            $stmt = $this->mysqli->prepare("INSERT INTO skema(ID,Week, Status, Description, Date, StartTime, EndTime, Class, Teacher, Room, Homework, Note) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?)");
+            
+            //If the prepared statement fails to be defined, false is returned
+            if(!($stmt)){
+                return false;
+            }
             
             //Binds parameters to the prepared statement. Every parameter is of type String
-            $stmt->bind_param("sssssssssss",$weekID,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); 
+            $result = $stmt->bind_param("sssssssssss",$weekID,$lesson->status,$lesson->description,$lesson->date,$lesson->startTime,$lesson->endTime,$lesson->class,$lesson->teacher,$lesson->room,$lesson->homework,$lesson->note); 
 
+            //If bind_param fails, false is returned
+            if(!($result)){
+                return false;
+            }
+            
             //Executes the prepared statement. Returns a boolean - true on succes and false on failure.
             $result = $stmt->execute(); 
 
-            //Creates error message if MySQL query was unsuccesful
-            if (!$result){ 
-                exit("<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br>");
+            //If execute fails, false is returned
+            if(!($result)){
+                return false;
             }
            
-
-            $stmt->close(); //Closes the prepared statement 
+            //Closes the prepared statement 
+            $stmt->close(); 
+            
         }   
+        
+        //true is returned on succes
+        return true;
     }
     
     
     /**
     * Deletes a week from the database
     *
-    * @param $connection is the MySQL connection object to delete the schedule from
     * @param string $weekID is the week to delete and year to delete
+    *
+    * @return boolean true on succes, false on failure
     */
-    private function deleteFromDatabase($connection,$weekID){
-        
-        //Includes connection.php - connects to database
-        require_once __DIR__.'/connection.php';
+    private function deleteFromDatabase($weekID){
         
         //Creates a prepared statement for the database
-        $stmt = mysqli_prepare($connection,"DELETE FROM `skema` WHERE `Week`= ?");
+        $stmt = $this->mysqli->prepare("DELETE FROM `skema` WHERE `Week`= ?");
             
+        
+        //If the prepared statement fails to be defined, false is returned
+        if(!($stmt)){
+            return false;
+        }
+
         //Binds parameters to the prepared statement. Every parameter is of type String
-        $stmt->bind_param("s",$weekID); 
+        $result = $stmt->bind_param("s",$weekID); 
+        
+        //If bind_param fails, false is returned
+        if(!($result)){
+            return false;
+        }
+        
     
         //Executes the prepared statement. Returns a boolean - true on succes and false on failure.
-        $result = $stmt->execute();   
+        $result = $stmt->execute();
         
-        //Creates error message if MySQL query was unsuccesful
-        if (!$result){ 
-            exit("<br>ERROR executing: $query"."<br>".mysqli_error($connection)."<br>");
+        //If execute fails, false is returned
+        if(!($result)){
+            return false;
         }
+        
+        //Closes the prepared statement
+        $stmt->close();
+        
+        //return true on succes
+        return true;
     }
 
     

@@ -10,22 +10,58 @@
 class LessonGoogleCalEvent{
     /** @var array $eventParams */
     //These are the Google Calendar event parameters, which can be passed to the Google Calendar API
-    public $eventParams;
+    private $eventParams;
+    
+    /** @var string $sumamry */
+    private $summary;
+    /** @var string $description */
+    private $description;
+    /** @var array $startEvent */
+    private $startEvent;
+    /** @var array $endEvent */
+    private $endEvent;
+    /** @var string $colorId */
+    private $colorId;
+    
     
     /**
     * Constructs the Google event object
     * @param $lessonObject is the object from which the calendar event is created from
     */
     function __construct($lessonObject){
-        $this->eventParams = array(
-        'summary' => $this->setSummary($lessonObject),
-        'description' => $this->setDescription($lessonObject),
-        'start' => $this->setStartEvent($lessonObject),
-        'end' => $this->setEndEvent($lessonObject),
-        'colorId' => $this->getColorId($lessonObject)
-        );
+        //sets calendar parameters
+        $this->setSummary($lessonObject);
+        $this->setDescription($lessonObject);
+        $this->setStartEvent($lessonObject);
+        $this->setEndEvent($lessonObject);
+        $this->setColorId($lessonObject);
+            
+        //Creates the eventParams array
+        $this->setEventParams(); 
     }
     
+    
+    /**
+    * This gets the google calendar event parameters
+    *
+    * @return array
+    */
+    public function getEventParams(){
+        return $this->eventParams;
+    }
+    
+    /**
+    * Sets the google calendar event parameters 
+    */
+    private function setEventParams(){
+        $this->eventParams = array(
+        'summary' => $this->summary,
+        'description' => $this->description,
+        'start' => $this->startEvent,
+        'end' => $this->endEvent,
+        'colorId' => $this->colorId
+        );
+    }
     
     /**
     * Returns the lesson's summary
@@ -35,18 +71,18 @@ class LessonGoogleCalEvent{
     private function setSummary($lessonObject){
         if($lessonObject->class){
             if($lessonObject->status){
-                return $lessonObject->status . "! " . $lessonObject->class;
+                $this->summary = $lessonObject->status . "! " . $lessonObject->class;
             }
             else{
-               return $lessonObject->class;  
+                $this->summary = $lessonObject->class;  
             }  
         }
         else{
             if($lessonObject->status){
-                return $lessonObject->status . "! " . $lessonObject->description;
+                $this->summary = $lessonObject->status . "! " . $lessonObject->description;
             }
             else{
-               return $lessonObject->description;  
+                $this->summary = $lessonObject->description;  
             } 
         }
        
@@ -95,7 +131,7 @@ class LessonGoogleCalEvent{
             
         }
         
-        return $descriptionString;
+        $this->description = $descriptionString;
     }
     
     /**
@@ -106,13 +142,13 @@ class LessonGoogleCalEvent{
     private function setStartEvent($lessonObject){
         
         if($lessonObject->startTime){
-            return array(
+            $this->startEvent = array(
             'dateTime' => $lessonObject->date.'T'.$lessonObject->startTime,
             'timeZone' => 'Europe/Copenhagen',
             );
         }
         else {
-            return array(
+            $this->startEvent = array(
             'date' => $lessonObject->date,
             'timeZone' => 'Europe/Copenhagen',
             );
@@ -128,13 +164,13 @@ class LessonGoogleCalEvent{
     private function setEndEvent($lessonObject){
         
          if($lessonObject->endTime){
-            return array(
+            $this->endEvent = array(
             'dateTime' => $lessonObject->date.'T'.$lessonObject->endTime,
             'timeZone' => 'Europe/Copenhagen',
             );
         }
         else {
-            return array(
+            $this->endEvent = array(
             'date' => $lessonObject->date,
             'timeZone' => 'Europe/Copenhagen',
             );
@@ -146,7 +182,7 @@ class LessonGoogleCalEvent{
     * @param $lessonObject is the lesson object created from the Lesson class
     * @return string
     */
-    private function getColorId($lessonObject){
+    private function setColorId($lessonObject){
         $colorsArray = array(
         'blue' => '1',
         'green'=>'2',
@@ -163,43 +199,43 @@ class LessonGoogleCalEvent{
         
         
         if($lessonObject->status == 'Ændret'){
-            return $colorsArray['bold green'];
+            $this->colorId = $colorsArray['bold green'];
         }
         else if($lessonObject->status == 'Aflyst'){
-            return $colorsArray['bold red'];
+            $this->colorId = $colorsArray['bold red'];
 
         }
         else{
            
             if($lessonObject->startTime == NULL && $lessonObject->endTime == NULL){
-                return $colorsArray['bold blue'];
+                $this->colorId = $colorsArray['bold blue'];
             }
             else if($lessonObject->class == "Matematik"){
-                return $colorsArray['turquoise'];
+                $this->colorId = $colorsArray['turquoise'];
             }
             else if($lessonObject->class == "Dansk"){
-                return $colorsArray['orange'];
+                $this->colorId = $colorsArray['orange'];
             }
             else if($lessonObject->class == "Fysik"){
-                return $colorsArray['red'];
+                $this->colorId = $colorsArray['red'];
             }
             else if($lessonObject->class == "Kemi"){
-                return $colorsArray['yellow'];
+                $this->colorId = $colorsArray['yellow'];
             }
             else if($lessonObject->class == "Samfundsfag"){
-                return $colorsArray['gray'];
+                $this->colorId = $colorsArray['gray'];
             }
             else if($lessonObject->class == "Informationsteknologi"){
-                return $colorsArray['purple'];
+                $this->colorId = $colorsArray['purple'];
             }
             else if($lessonObject->class == "Programmering"){
-                return $colorsArray['purple'];
+                $this->colorId = $colorsArray['purple'];
             }
             else if($lessonObject->class == "Teknik"){
-                return $colorsArray['green'];
+                $this->colorId = $colorsArray['green'];
             }
             else{
-                return $colorsArray['blue'];
+                $this->colorId = $colorsArray['blue'];
             }
       
         }

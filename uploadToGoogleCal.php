@@ -93,10 +93,15 @@ else {
     header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 }
 
-
+//Deletes the events from the week
 deleteEvents($_SESSION['startDate'],$_SESSION['endDate'],$client,$service,$calendarId);
+
+//New LectioScrape object is created
 $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
+
+//The schedule is sent to Google Cal
 sendToGoogleCal($schedule->scheduleGoogle,$client,$service,$calendarId);
+
 
 $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/index.html';
 header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
@@ -121,9 +126,9 @@ function sendToGoogleCal($scheduleList,$client,$service,$calendarId){
     $client->setUseBatch(true);
     $batch = new Google_Http_Batch($client);
     
-    foreach($scheduleList as $list) {
+    foreach($scheduleList as $eventParams) {
         //Creates new event
-        $event = new Google_Service_Calendar_Event($list->eventParams);
+        $event = new Google_Service_Calendar_Event($eventParams);
         
         //Inserts the event to the calendar
         $event = $service->events->insert($calendarId, $event);
