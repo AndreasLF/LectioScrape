@@ -1,8 +1,8 @@
 $(document).ready(function() {
 
             //When the page is ready the calendar will be initialized
-
             $('#calendar').fullCalendar({
+                //Links to the json feed
                 events: 'fullcalendarFeed.php',
                 editable: false,
                 header: {
@@ -10,6 +10,7 @@ $(document).ready(function() {
                     center: '',
                     right: 'next'
                 },
+                //Only view a week at a time
                 defaultView: 'agendaWeek',
                 minTime: '07:00:00',
                 maxTime: '19:00:00',
@@ -19,16 +20,20 @@ $(document).ready(function() {
                 timeFormat: 'H(:mm)',
                 slotEventOverlap: false,
                 eventOverlap: false,
+                //Set event click listener. When an event on the calendar is clicked, this will trigger
                 eventClick: function(event, jsEvent, view) {
+                    //Sets modal information
                     $('#eventModalTitle').html(event.title);
                     $('#eventModalBody').html(event.description);
                     $('#eventModalLectioButtonLink').prop("href",event.lessonURL);
+                    //Opens the modal
                     $('#fullCalendarModal').modal();
                 },
                 firstDay: 1
             })
     
     
+            //When googleButton is clicked
             $("#googleButton").click(function(){
                 
                 //Gets the current view from the calendar
@@ -45,6 +50,7 @@ $(document).ready(function() {
 
             });
     
+            //When databaseButton is clicked
             $("#databaseButton").click(function(){
                 
                 //Gets the current view from the calendar

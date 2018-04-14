@@ -62,7 +62,6 @@ class LessonFullcalendar{
     
     /**
     * This sets the calendarEvent property
-    *
     */
     private function setCalendarEvent(){
         $this->calendarEvent = array(
@@ -83,27 +82,38 @@ class LessonFullcalendar{
     * @param $lessonObject is the lesson object created from the Lesson class
     */
     private function setTitle($lessonObject){
+        //If lessonObject contains a description and class
         if($lessonObject->description && $lessonObject->class){
+            //If lessonObject contains a status
             if($lessonObject->status){
+                //The title will contain the status, the description and the class in parantheses
                 $this->title = $lessonObject->status. "!\n". $lessonObject->description . "\n(".$lessonObject->class.")";
             }
             else{
+                //The title will contain the description and class in parentheses
                  $this->title = $lessonObject->description . "\n(".$lessonObject->class.")";
             }
         }
+        //Else if lessonObject only contains a class
         else if($lessonObject->class){
+            //Checks if lessonObject contains a status
             if($lessonObject->status){
-                return $lessonObject->status. "!\n". $lessonObject->class;
+                //The title will contain staus and class
+                $this->title = $lessonObject->status. "!\n". $lessonObject->class;
             }
             else{
+                //The lesson will only contain the class
                 $this->title = $lessonObject->class;
             }
         }
         else{
+            //Checks if lessonObject contains status
             if($lessonObject->status){
+                //The title will contain status and description
                 $this->title = $lessonObject->status. "!\n". $lessonObject->description;
             }
             else{
+                //The title will contain only the description
                 $this->title = $lessonObject->description;
             }
         }
@@ -117,9 +127,10 @@ class LessonFullcalendar{
     */
     private function setDescription($lessonObject){
         
+        //An array is created
         $descriptionArray = array();
         
-        
+        //Checks for prperties in the lessonObject. If a property exists it will be added to the description array 
         if($lessonObject->status){
             $descriptionArray[] = $lessonObject->status;
         }
@@ -153,13 +164,16 @@ class LessonFullcalendar{
         }
         
         
+        //Description string is created
         $descriptionString = "";
     
+        //For each element in the descriptionArray the element will be added to the descriptionString
         foreach($descriptionArray as $desc){
             $descriptionString = $descriptionString . $desc . "<br>";
             
         }
         
+        //The description property is set to contain the description string
         $this->description = $descriptionString;
     }
     
@@ -169,6 +183,7 @@ class LessonFullcalendar{
     */
     private function setStartEvent($lessonObject){
         
+        //If startTime exists the event wont last all day
         if($lessonObject->startTime){
             $this->startEvent = array(
                 'start' => $lessonObject->date.'T'.$lessonObject->startTime,
@@ -190,7 +205,8 @@ class LessonFullcalendar{
     */
     private function setEndEvent($lessonObject){
         
-         if($lessonObject->endTime){
+        //If endTime exists the event wont last all day
+        if($lessonObject->endTime){
             $this->endEvent = array(
                 'end' => $lessonObject->date.'T'.$lessonObject->endTime,
                 'allDay' => false
@@ -218,6 +234,7 @@ class LessonFullcalendar{
     * @param $lessonObject is the lesson object created from the Lesson class
     */
     private function setEventColor($lessonObject){
+        //Defines an array of colors (hex)
         $colorsArray = array(
             'red'=>'#d32f2f',
             'pink'=>'#c2185b',
@@ -240,18 +257,19 @@ class LessonFullcalendar{
             'blue gray'=>'#455a64'
         );
         
-        
-         if($lessonObject->status == 'Ændret'){
+        //If the lesson is changed or cancelled the color will be set
+        if($lessonObject->status == 'Ændret'){
             $this->color = $colorsArray['green'];
         }
         else if($lessonObject->status == 'Aflyst'){
             $this->color = $colorsArray['red'];
         }
         else{
-
+            //Checks if the event is an all day event and sets the color
             if($lessonObject->startTime == NULL && $lessonObject->endTime == NULL){
                 $this->color = $colorsArray['indigo'];
             }
+            //Checks the class of the lesson and sets a corresponding color
             else if($lessonObject->class == "Matematik"){
                 $this->color = $colorsArray['blue'];
             }

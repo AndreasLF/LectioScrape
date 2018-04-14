@@ -1,8 +1,10 @@
 <?php
 session_start();
 
-
+//Requires the Google Client Library
 require_once __DIR__.'/vendor/autoload.php';
+
+//Includes classes
 require_once __DIR__.'/Lesson.class.php';
 require_once __DIR__.'/LessonGoogleCalEvent.class.php';
 require_once __DIR__.'/LectioScrape.class.php';
@@ -102,6 +104,8 @@ $schedule = new LectioScrape($_SESSION['startDate'].'T10:50:31');
 //The schedule is sent to Google Cal
 sendToGoogleCal($schedule->scheduleGoogle,$client,$service,$calendarId);
 
+//Destroys the session
+session_destroy();
 
 $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/LectioScrape/index.html';
 header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));

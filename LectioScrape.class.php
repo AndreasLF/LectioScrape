@@ -3,8 +3,8 @@
 
 /**
 * LectioScrape
-*
 * This creates a lectioScrape object containing the schedule for one week
+*
 * @author Andreas Fiehn
 */
 
@@ -36,9 +36,9 @@ class LectioScrape{
     * @param string $date is a date inside the week you want to scrape. The date is in ISO8601 format
     */
     function __construct($date){
-        //Includes simple_html_dom library
+				//Includes simple_html_dom library
         require_once __DIR__.'/simple_html_dom.php';
-    
+    			
         //Includes classes
         require_once __DIR__.'/Lesson.class.php';
         require_once __DIR__.'/LessonGoogleCalEvent.class.php';
@@ -70,48 +70,57 @@ class LectioScrape{
         //gets the week number from the date and saves it in $date. $date is now an array containing weekNumber and year
         $date = $this->getWeekNumberFromDate($date);
 
-        //Sets the weekNumber and year class properties
+        //Sets the weekNumber and year properties
         $this->weekNumber = $date['weekNumber'];
         $this->year = $date['year'];
         
+        //Sets the url's weekID, schoolID and studentID
         $weekID = $date['weekNumber'].$date['year'];
         $schoolID = "681";
         $studentID = "14742506655";
+        
+        //Creates the schedule url
         $lectioURL = "http://www.lectio.dk/lectio/".$schoolID."/SkemaNy.aspx?type=elev&elevid=".$studentID."&week=".$weekID;
 
 
-        //creates html-DOM from the URL
+        //creates html-DOM from the URL (uses simple_html_dom library)
         $html = file_get_html($lectioURL);
 
+        //Define schedule variables
         $schedule;
         $scheduleGoogle;
         $scheduleFullcalendar;
 
+        //Loop foreach element in the html dom with the class s2skemabrik
         foreach($html->find('.s2skemabrik') as $element){
+            //Gets the data-additionalinfo attribute from the element
             $data = $element->getAttribute('data-additionalinfo');
             
-            
+            //If a href attribute exists this is saved as the url. Else the lectioUrl will be the url
             if($href = $element->href){
-                $url = "https://www.lectio.dk" . $element->href;
+                $url = "https://www.lectio.dk" . $href;
             }
             else{
                 $url = $lectioURL;
             }
             
 
-            //Peforms af regular expression to check if the class has a date. If not it wont be processed
+            //Peforms a regular expression to check if the data-additionalinfo contains a date in the desired format. If not it wont be processed
             if(!(preg_match('/(\d\d|\d)\/(\d\d|\d)-(\d\d\d\d)/', $data, $dateArr)==0)){
-
+                
+                //Lesson object are created
                 $lesson = new Lesson($data,$url);
                 $lessonGoogle = new LessonGoogleCalEvent($lesson);
                 $lessonFullcalendar = new LessonFullcalendar($lesson);
 
+                //The objects are added to the schedule arrays
                 $schedule[] = $lesson;
                 $scheduleGoogle[] = $lessonGoogle->getEventParams();
                 $scheduleFullcalendar[] = $lessonFullcalendar->getCalendarEvent();
             }
         }
 
+        //An array containing the three schedule arrays is returned
         return array('schedule' => $schedule,'scheduleGoogle' => $scheduleGoogle, 'scheduleFullcalendar' => $scheduleFullcalendar);    
     }
 
@@ -142,6 +151,7 @@ class LectioScrape{
         //Saves the new date in an array as the end date
          $dateRangeArray['weekEnd'] = $dateTimeObject->format('Y-m-d');
 
+        //Returns the date range array
         return $dateRangeArray;
     }
 
@@ -156,9 +166,13 @@ class LectioScrape{
     */
     private function getWeekNumberFromDate($date){
 
+        //Creates ned datetime object from the date
         $dateTimeObject = new DateTime($date);
+        //The weeknumber is saved
         $weekNumber = $dateTimeObject->format("W");
+        //The year is saved
         $year = $dateTimeObject->format("Y");
+        //Returns array containing week number and year
         return array('weekNumber' => $weekNumber,'year' => $year); 
     }
 
@@ -188,6 +202,7 @@ class LectioScrape{
             return false;
         }
         
+        //Loops for each lesson in the scheduleMySql parameter
         foreach($this->scheduleMySql as $lesson){ 
             
             //Creates a prepared statement for the database
@@ -206,7 +221,7 @@ class LectioScrape{
                 return false;
             }
             
-            //Executes the prepared statement. Returns a boolean - true on succes and false on failure.
+            //Executes the prepared statement
             $result = $stmt->execute(); 
 
             //If execute fails, false is returned

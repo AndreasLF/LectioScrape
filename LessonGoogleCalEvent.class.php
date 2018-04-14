@@ -69,7 +69,9 @@ class LessonGoogleCalEvent{
     * @return string
     */
     private function setSummary($lessonObject){
+        //If lessonObject contains class
         if($lessonObject->class){
+            //If a status exists
             if($lessonObject->status){
                 $this->summary = $lessonObject->status . "! " . $lessonObject->class;
             }
@@ -95,10 +97,10 @@ class LessonGoogleCalEvent{
     * @return string
     */
     private function setDescription($lessonObject){
-        
+        //Creates description array
         $descriptionArray = array();
         
-        
+        //If a lessonObject property exists it wil be added to the array
         if($lessonObject->status){
             $descriptionArray[] = $lessonObject->status;
         }
@@ -123,14 +125,16 @@ class LessonGoogleCalEvent{
             $descriptionArray[] = "Note: " . $lessonObject->note;
         }
         
-        
+        //Description string is defined
         $descriptionString = "";
     
+        //For each element in description array, the description is added to the string
         foreach($descriptionArray as $desc){
             $descriptionString = $descriptionString . $desc . "<br>";
             
         }
         
+        //Sets the description property
         $this->description = $descriptionString;
     }
     
@@ -140,7 +144,7 @@ class LessonGoogleCalEvent{
     * @return array
     */
     private function setStartEvent($lessonObject){
-        
+        //If lessonObject does not have a startTime the event will last all day
         if($lessonObject->startTime){
             $this->startEvent = array(
             'dateTime' => $lessonObject->date.'T'.$lessonObject->startTime,
@@ -162,8 +166,8 @@ class LessonGoogleCalEvent{
     * @return string
     */
     private function setEndEvent($lessonObject){
-        
-         if($lessonObject->endTime){
+        //If lessonObject does not have an endTime the event will last all day
+        if($lessonObject->endTime){
             $this->endEvent = array(
             'dateTime' => $lessonObject->date.'T'.$lessonObject->endTime,
             'timeZone' => 'Europe/Copenhagen',
@@ -183,6 +187,7 @@ class LessonGoogleCalEvent{
     * @return string
     */
     private function setColorId($lessonObject){
+        //Defines the colors in an array (google calendar color id)
         $colorsArray = array(
         'blue' => '1',
         'green'=>'2',
@@ -197,6 +202,7 @@ class LessonGoogleCalEvent{
         'bold red' => '11',
         );
         
+        //Checks for information and sets the color corresponding to the information
         
         if($lessonObject->status == 'Ændret'){
             $this->colorId = $colorsArray['bold green'];
