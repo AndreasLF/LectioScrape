@@ -10,7 +10,7 @@ $(document).ready(function() {
                     center: '',
                     right: 'next'
                 },
-                //Only view a week at a time
+                //Only view one week at a time
                 defaultView: 'agendaWeek',
                 minTime: '07:00:00',
                 maxTime: '19:00:00',
